@@ -2,8 +2,8 @@
     !--Login Strings
     <string name="app_name">JDSecuritySolutions</string>
     <string name="login_title">LoginAndRegister</string>
-    <string name="User">Username:</string>
-    <string name="Pass">Password:</string>
+    <string name="UserField">Username:</string>
+    <string name="PassField">Password:</string>
     <string name="Login">Login</string>
     <string name="Register">Register</string>
     <string name="Forgot">Forgot you password?</string>
@@ -12,7 +12,17 @@
     <string name="LoginFail">Incorrect Username/Password</string>
 
     !--Register Strings
+    <string name="RegInfo">Registration Information</string>
     <string name="SubmitInfo">Submit</string>
+    <string name="NameField">Full Name:</string>
+    <string name="NameHint">Joe Smith</string>
+    <string name="ConfirmPassField">Confirm Password:</string>
+    <string name="EmailField">Email Address:</string>
+    <string name="EmailHint">123@gmail.com</string>
 
+    !--ForgotPasswword Strings
+    <string name="Send">Send</string>
+    <string name="NoEmailFound">Email Address Does Not Exist.</string>
+    <string name="WrongEmailFormat">Please use a proper email format.</string>
 
 </resources>
