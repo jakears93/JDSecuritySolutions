@@ -1,3 +1,2 @@
-include ':loginandregister'
-include ':app'
+include ':JDSecuritySolutions'
 rootProject.name = "JDSecuritySolutions"
