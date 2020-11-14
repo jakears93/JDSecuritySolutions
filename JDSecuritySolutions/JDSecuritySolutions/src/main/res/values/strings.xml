@@ -1,4 +1,5 @@
 <resources>
+    !--Login Strings
     <string name="app_name">JDSecuritySolutions</string>
     <string name="login_title">LoginAndRegister</string>
     <string name="User">Username:</string>
@@ -8,4 +9,10 @@
     <string name="Forgot">Forgot you password?</string>
     <string name="UserHint">Your Username</string>
     <string name="PassHint">Your Password</string>
+    <string name="LoginFail">Incorrect Username/Password</string>
+
+    !--Register Strings
+    <string name="SubmitInfo">Submit</string>
+
+
 </resources>
