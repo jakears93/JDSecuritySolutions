@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginAndRegister">
+    tools:context="jacob.daniel.jdsecuritysolutions.LoginAndRegister"
+    android:background="@color/mainBackground">
 
     <ImageView
         android:id="@+id/logoView"
@@ -19,6 +20,7 @@
 
     <TextView
         android:id="@+id/usernameView"
+        style="@style/LabelTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/User"
@@ -32,6 +34,7 @@
 
     <TextView
         android:id="@+id/passwordView"
+        style="@style/LabelTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Pass"
@@ -45,29 +48,14 @@
         app:layout_constraintVertical_bias="0.643" />
 
     <EditText
-        android:id="@+id/addPass"
-        android:layout_width="200sp"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="44dp"
-        android:hint="@string/PassHint"
-        android:inputType="textPassword"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.228"
-        app:layout_constraintStart_toEndOf="@+id/passwordView"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.624" />
-
-    <EditText
         android:id="@+id/addUser"
+        style="@style/EditTextStyle"
         android:layout_width="200sp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginTop="112dp"
         android:hint="@string/UserHint"
-        android:textSize="14sp"
+        android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.228"
@@ -75,8 +63,26 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.379" />
 
+    <EditText
+        android:id="@+id/addPass"
+        style="@style/EditTextStyle"
+        android:backgroundTint="@color/white"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="44dp"
+        android:hint="@string/PassHint"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.228"
+        app:layout_constraintStart_toEndOf="@+id/passwordView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.624" />
+
     <TextView
         android:id="@+id/forgotPass"
+        style="@style/LabelTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
