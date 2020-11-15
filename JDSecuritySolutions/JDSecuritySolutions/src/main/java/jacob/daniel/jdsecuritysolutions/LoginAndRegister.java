@@ -49,7 +49,7 @@ public class LoginAndRegister extends AppCompatActivity {
 
     private int authenticate(){
         //Check user/pass in database. for each failed check, decrement status.  if any fail, login fails.
-        int status = 0;
+        int status;
         EditText user = (EditText) findViewById(R.id.addUser);
         EditText pass = (EditText) findViewById(R.id.addPass);
 
@@ -57,6 +57,16 @@ public class LoginAndRegister extends AppCompatActivity {
         //TODO check current device config
         //TODO set status and errormsg
         //Status=0 when new device, 1=viewer, 2=camera
+
+        //DEBUG
+        if(user.getText().toString().equals("")){
+            status = 0;
+        }
+        else{
+            status = -1;
+            errorMsg = getResources().getString(R.string.LoginFail);
+        }
+        // end DEBUG
 
         return status;
     }

@@ -18,6 +18,57 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+    <TextView
+        android:id="@+id/ViewerLabel"
+        style="@style/LabelTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clickedViewer"
+        android:text="@string/ViewerLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/viewerImageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.175"
+        app:layout_constraintStart_toEndOf="@+id/viewerImageButton"
+        app:layout_constraintTop_toTopOf="@+id/viewerImageButton" />
+
+    <ImageButton
+        android:id="@+id/viewerImageButton"
+        android:layout_width="70sp"
+        android:layout_height="70sp"
+        android:onClick="clickedViewer"
+        android:src="@drawable/logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.225"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoView"
+        app:layout_constraintVertical_bias="0.25" />
+
+    <TextView
+        android:id="@+id/CameraLabel"
+        style="@style/LabelTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clickedCamera"
+        android:text="@string/CameraLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/CameraImageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.175"
+        app:layout_constraintStart_toEndOf="@+id/viewerImageButton"
+        app:layout_constraintTop_toTopOf="@+id/CameraImageButton" />
+
+    <ImageButton
+        android:id="@+id/CameraImageButton"
+        android:layout_width="70sp"
+        android:layout_height="70sp"
+        android:onClick="clickedCamera"
+        android:src="@drawable/logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.225"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewerImageButton"
+        app:layout_constraintVertical_bias="0.25" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

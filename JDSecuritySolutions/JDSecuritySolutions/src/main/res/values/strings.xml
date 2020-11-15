@@ -25,4 +25,14 @@
     <string name="NoEmailFound">Email Address Does Not Exist.</string>
     <string name="WrongEmailFormat">Please use a proper email format.</string>
 
+    !--ChooseConfig Strings
+    <string name="ViewerLabel">Use This Device as a Viewer</string>
+    <string name="CameraLabel">Use This Device as a Camera</string>
+
+    !--CameraDevice Strings
+    <string name="RoomNameLabel">Room Name:</string>
+    <string name="RoomNameHint">Living Room</string>
+    <string name="DefaultRoom">Default Room</string>
+
+
 </resources>
