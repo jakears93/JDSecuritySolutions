@@ -10,10 +10,10 @@
 
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switch1"
+        android:id="@+id/toggle"
         android:layout_width="50dp"
         android:layout_height="30dp"
-        android:checked="true"
+        android:checked="false"
         android:onClick="flippedSwitch"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,11 +28,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/CameraLabel"
-        app:layout_constraintBottom_toBottomOf="@+id/switch1"
+        app:layout_constraintBottom_toBottomOf="@+id/toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.513"
-        app:layout_constraintStart_toEndOf="@+id/switch1"
-        app:layout_constraintTop_toTopOf="@+id/switch1"/>
+        app:layout_constraintStart_toEndOf="@+id/toggle"
+        app:layout_constraintTop_toTopOf="@+id/toggle"/>
 
     <TextView
         android:id="@+id/RoomNameLabel"
@@ -45,7 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.203"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switch1"
+        app:layout_constraintTop_toBottomOf="@+id/toggle"
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText

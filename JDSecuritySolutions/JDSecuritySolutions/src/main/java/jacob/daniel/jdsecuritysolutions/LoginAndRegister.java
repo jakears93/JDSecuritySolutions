@@ -1,5 +1,6 @@
 package jacob.daniel.jdsecuritysolutions;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -8,8 +9,17 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+
 public class LoginAndRegister extends AppCompatActivity {
     private String errorMsg = "";
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,25 +59,19 @@ public class LoginAndRegister extends AppCompatActivity {
 
     private int authenticate(){
         //Check user/pass in database. for each failed check, decrement status.  if any fail, login fails.
-        int status;
-        EditText user = (EditText) findViewById(R.id.addUser);
-        EditText pass = (EditText) findViewById(R.id.addPass);
+        int status = -1;
+        EditText username = (EditText) findViewById(R.id.addUser);
+        EditText password = (EditText) findViewById(R.id.addPass);
+
 
         //TODO validate login info with DB
         //TODO check current device config
         //TODO set status and errormsg
         //Status=0 when new device, 1=viewer, 2=camera
 
-        //DEBUG
-        if(user.getText().toString().equals("")){
-            status = 0;
-        }
-        else{
-            status = -1;
-            errorMsg = getResources().getString(R.string.LoginFail);
-        }
-        // end DEBUG
-
         return status;
     }
+
+
+
 }

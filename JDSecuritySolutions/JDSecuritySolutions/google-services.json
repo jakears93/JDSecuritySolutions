@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "341663169893",
+    "firebase_url": "https://jdsecuritysolutions-5726a.firebaseio.com",
+    "project_id": "jdsecuritysolutions-5726a",
+    "storage_bucket": "jdsecuritysolutions-5726a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341663169893:android:f0f1ca7ad0826ab3b4b58c",
+        "android_client_info": {
+          "package_name": "jacob.daniel.jdsecuritysolutions"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341663169893-qr02e7qgtn8ks3it8f9hqfujq82sevkj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdwpVpdqihzsOkRh-B4Qy5DjGQ2OKAJcE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341663169893-qr02e7qgtn8ks3it8f9hqfujq82sevkj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

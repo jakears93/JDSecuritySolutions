@@ -19,6 +19,12 @@
     <string name="ConfirmPassField">Confirm Password:</string>
     <string name="EmailField">Email Address:</string>
     <string name="EmailHint">123@gmail.com</string>
+    <string name="usernameErrorMsg">Username already taken.</string>
+    <string name="passwordErrorMsg">Password must be 8 or more characters.</string>
+    <string name="confirmPasswordErrorMsg">Passwords must match.</string>
+    <string name="nameErrorMsg">Name must be 2 or more characters.</string>
+    <string name="emailErrorMsg">Improper email format.</string>
+
 
     !--ForgotPasswword Strings
     <string name="Send">Send</string>

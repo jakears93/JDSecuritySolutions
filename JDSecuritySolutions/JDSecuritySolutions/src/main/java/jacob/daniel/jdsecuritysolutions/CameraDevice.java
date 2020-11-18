@@ -13,99 +13,74 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
 
 //TODO change video orientation
 //TODO add surfaceview to layout
 //TODO reorganize code structure
+//TODO change vidcount to value from preferences
 
 public class CameraDevice extends AppCompatActivity {
 
     private static final int MAX_PREVIEW_WIDTH = 1280;
     private static final int MAX_PREVIEW_HEIGHT = 720;
     private boolean allowRecord = false;
+    private MediaRecorder recorder;
+    SurfaceTexture sft = new SurfaceTexture(0);
+    Surface sf = new Surface(sft);
+    EditText room;
+    SwitchCompat toggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_device);
-        checkPermissions();
-        if(allowRecord) {
-            try {
-                dispatchTakeVideoIntent();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast toast = Toast.makeText(getApplicationContext(), "IOEXCEPTION", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        }
-        else{
-            Toast toast = Toast.makeText(getApplicationContext(), "Cannot Record", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
-
-    private void dispatchTakeVideoIntent() throws IOException {
-            final String fileName =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "test.mp4";
-            final MediaRecorder recorder = new MediaRecorder();
-
-            SurfaceTexture sft = new SurfaceTexture(0);
-            Surface sf = new Surface(sft);
-
-            recorder.setPreviewDisplay(sf);
-            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            recorder.setOutputFile(fileName);
-            recorder.setVideoFrameRate(60);
-            recorder.setVideoSize(MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT);
-            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-
-            recorder.prepare();
-            try {
-                recorder.start();
-                new CountDownTimer(10000, 1000) {
-
-                    public void onTick(long millisUntilFinished) {
-
-                    }
-
-                    public void onFinish() {
-                        Toast toast=Toast.makeText(getApplicationContext(),"DONE",Toast.LENGTH_SHORT);
-                        toast.show();
-                        recorder.stop();
-                        recorder.reset();   // You can reuse the object by going back to setAudioSource() step
-                        recorder.release(); // Now the object cannot be reused
-                        VideoView screen = findViewById(R.id.video);
-                        screen.setVideoURI(Uri.parse(fileName));
-                    }
-                }.start();
-            }catch(Exception ex){
-                ex.printStackTrace();
-                Toast toast=Toast.makeText(getApplicationContext(),"Failed To Start Recorder",Toast.LENGTH_SHORT);
-                toast.show();
-            }
+        room = findViewById(R.id.RoomName);
+        toggle = findViewById(R.id.toggle);
     }
 
     public void flippedSwitch(View v) {
-
+        if(toggle.isChecked()){
+            checkPermissions();
+            if(allowRecord) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Recording", Toast.LENGTH_SHORT);
+                toast.show();
+                Thread recording = new Thread(new StartRecording(recorder));
+                recording.start();
+                try {
+                    recording.join();
+                    toast = Toast.makeText(getApplicationContext(), "Done Recording", Toast.LENGTH_SHORT);
+                    toast.show();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void checkPermissions() {
@@ -131,4 +106,81 @@ public class CameraDevice extends AppCompatActivity {
         }
     }
 
-}
+    public class StartRecording implements Runnable{
+        private MediaRecorder recorder;
+
+        StartRecording(MediaRecorder r){
+            this.recorder = r;
+        }
+
+        public void record(){
+            recorder = new MediaRecorder();
+            final String fileName = getFilePath();
+            recorder.setPreviewDisplay(sf);
+            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            recorder.setOrientationHint(90);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            recorder.setOutputFile(fileName);
+            recorder.setVideoFrameRate(10);
+            recorder.setMaxDuration(3000);
+            recorder.setVideoSize(MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT);
+            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+            try {
+                recorder.prepare();
+                recorder.start();
+            }catch(Exception ex){
+                ex.printStackTrace();
+                Toast toast=Toast.makeText(getApplicationContext(),"Failed To Start Recorder",Toast.LENGTH_SHORT);
+                toast.show();
+            }
+
+/*            final CountDownLatch latch = new CountDownLatch(10);
+            int delay = 1000;
+            int period = 3000;
+
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                public void run() {
+                    latch.countDown();
+                }
+            }, delay, period);
+            try {
+                latch.await();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            timer.cancel();
+            Toast toast=Toast.makeText(getApplicationContext(),"DONE",Toast.LENGTH_SHORT);
+            toast.show();
+            recorder.stop();
+            recorder.reset();   // You can reuse the object by going back to setAudioSource() step
+            recorder.release(); // Now the object cannot be reused*/
+            /*VideoView screen = findViewById(R.id.video);
+            screen.setVideoPath(fileName);
+            screen.start();*/
+        }
+
+        public String getFilePath(){
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
+            Date custDate = new Date();
+            String roomName = room.getText().toString();
+
+            String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+sdf.format(custDate)+".mp4";
+            Toast toast=Toast.makeText(getApplicationContext(),filePath,Toast.LENGTH_LONG);
+            toast.show();
+            return filePath;
+        }
+
+        public void storeVideoToFirebase(File video){
+
+        }
+
+        public void run(){
+            Looper.prepare();
+            record();
+        }
+    }//end of record class
+}//end of parent class

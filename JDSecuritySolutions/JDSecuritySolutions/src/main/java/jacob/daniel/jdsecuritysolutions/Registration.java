@@ -4,12 +4,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseError;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Registration extends AppCompatActivity {
 
-    private String errorMsg = "";
+    EditText info;
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    int status = 0;
+    boolean exists = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,21 +36,137 @@ public class Registration extends AppCompatActivity {
     }
 
     public void submitInfo(View v){
-        int status = validateInfo();
-        if(status == 0){
-            Intent intent = new Intent(Registration.this, LoginAndRegister.class);
-            startActivity(intent);
-        }
-        else{
-
+        User user = validateInfo();
+        if(status==0) {
+            checkIfUserExists(v, user);
         }
     }
 
-    private int validateInfo(){
-        int status = 0;
+    //TODO move checkIfUserExists method to user class
 
-        //TODO validate info, set error message on appropriate editviews
+    public void checkIfUserExists(final View v, final User user){
 
-        return status;
+        DatabaseReference rootRef = database.getReference();
+        final DatabaseReference userNameRef = rootRef.child("Usernames/"+user.username);
+
+        //TODO fix validate username
+        readData(userNameRef, new OnGetDataListener() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                User checkUser = new User();
+                try {
+                    HashMap<String, Object> temp = (HashMap<String, Object>) dataSnapshot.getValue();
+                    for (String key : temp.keySet()) {
+                        String tempStr = String.valueOf(temp.get(key));
+                        if(key.equals("name")){
+                            checkUser.name=tempStr;
+                        }
+                        else if(key.equals("email")){
+                            checkUser.email=tempStr;
+                        }
+                        else if(key.equals("password")){
+                            checkUser.password=tempStr;
+                        }
+                        else if(key.equals("username")){
+                            checkUser.username=tempStr;
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                if(checkUser.username.equals(user.username)){
+                    info.setError(getResources().getString(R.string.usernameErrorMsg));
+                }
+                else{
+                    //Submit info to firebase
+                    DatabaseReference ref = database.getReference();
+                    ref.child("Usernames").child(user.username).setValue(user);
+                    returnToLogin(v);
+                }
+            }
+            @Override
+            public void onStart() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+    }
+
+    public void returnToLogin(View v){
+        Intent intent = new Intent(Registration.this, LoginAndRegister.class);
+        startActivity(intent);
+    }
+
+    private User validateInfo(){
+        status = 0;
+
+        User user = new User();
+
+        info=findViewById(R.id.fullNameInput);
+        user.name = info.getText().toString();
+        if(user.name.length() < 2){
+            info.setError(getResources().getString(R.string.nameErrorMsg));
+            status = -1;
+        }
+
+        info=findViewById(R.id.passwordInput);
+        user.password = info.getText().toString();
+        if(user.password.length() < 8){
+            //set error
+            info.setError(getResources().getString(R.string.passwordErrorMsg));
+            status = -1;
+        }
+
+        info=findViewById(R.id.confirmPasswordInput);
+        String confirmPass = info.getText().toString();
+        if(!confirmPass.equals(user.password) || confirmPass.length()==0){
+            //set error
+            info.setError(getResources().getString(R.string.confirmPasswordErrorMsg));
+            status = -1;
+        }
+
+        info=findViewById(R.id.emailInput);
+        user.email = info.getText().toString();
+        //TODO validate email format
+        if(user.email.length() < 5){
+            info.setError(getResources().getString(R.string.emailErrorMsg));
+            status = -1;
+        }
+
+        info=findViewById(R.id.userNameInput);
+        user.username = info.getText().toString();
+        if(user.username.length()<2){
+            info.setError(getResources().getString(R.string.usernameErrorMsg));
+            status = -1;
+        }
+        return user;
+    }
+
+    public void readData(final DatabaseReference ref, final OnGetDataListener listener) {
+        final boolean hasFinished = false;
+        listener.onStart();
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                listener.onSuccess(dataSnapshot);
+                //TODO remove listener
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onFailure();
+            }
+        });
+
+    }
+
+    public interface OnGetDataListener {
+        //this is for callbacks
+        void onSuccess(DataSnapshot dataSnapshot);
+        void onStart();
+        void onFailure();
     }
 }
