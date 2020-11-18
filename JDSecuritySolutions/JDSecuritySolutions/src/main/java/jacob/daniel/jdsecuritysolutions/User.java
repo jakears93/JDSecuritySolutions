@@ -44,6 +44,7 @@ public class User{
         }
     }
 
+    //TODO finish function to return user from db
     public User retrieveUserInfoFromDb(){
 
         final User referenceUser = this;

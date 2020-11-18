@@ -40,5 +40,9 @@
     <string name="RoomNameHint">Living Room</string>
     <string name="DefaultRoom">Default Room</string>
 
+    !--ViewerDevice Strings
+    <string name="LiveLabel">LIVE</string>
+
+
 
 </resources>

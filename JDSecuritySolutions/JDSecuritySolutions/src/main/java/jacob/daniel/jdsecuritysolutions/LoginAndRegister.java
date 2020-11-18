@@ -18,7 +18,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 
 public class LoginAndRegister extends AppCompatActivity {
-    private String errorMsg = "";
     FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
@@ -42,7 +41,7 @@ public class LoginAndRegister extends AppCompatActivity {
             startActivity(intent);
         }
         else if (loginCode < 0){
-            Toast toast=Toast.makeText(getApplicationContext(),errorMsg,Toast.LENGTH_SHORT);
+            Toast toast=Toast.makeText(getApplicationContext(),getResources().getString(R.string.LoginFail),Toast.LENGTH_SHORT);
             toast.show();
         }
     }
@@ -60,14 +59,26 @@ public class LoginAndRegister extends AppCompatActivity {
     private int authenticate(){
         //Check user/pass in database. for each failed check, decrement status.  if any fail, login fails.
         int status = -1;
-        EditText username = (EditText) findViewById(R.id.addUser);
-        EditText password = (EditText) findViewById(R.id.addPass);
-
+        EditText usernameField = (EditText) findViewById(R.id.addUser);
+        EditText passwordField = (EditText) findViewById(R.id.addPass);
+        String username = usernameField.getText().toString();
+        String password = passwordField.getText().toString();
 
         //TODO validate login info with DB
         //TODO check current device config
         //TODO set status and errormsg
         //Status=0 when new device, 1=viewer, 2=camera
+
+        //DEBUG
+        if(username.equals("jacob")){
+            if(password.equals("daniel")){
+                status = 0;
+            }
+        }
+        else{
+            status = 0;
+        }
+        //ENDOFDEBUG
 
         return status;
     }
