@@ -1,29 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".ViewerDevice">
+
 
     <item
-        android:id="@+id/nav_0"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="home"
-        app:showAsAction="ifRoom|withText"/>
+        style="@style/AppTheme"
+        android:id="@+id/action_search"
+        android:title="action search"
+        app:showAsAction="always"
+        android:orderInCategory="1"></item>
 
     <item
-        android:id="@+id/nav_1"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="email"
-        app:showAsAction="ifRoom|withText"/>
+        style="@style/AppTheme"
+        android:id="@+id/action_navigation"
+        android:title="action nav"
+        app:showAsAction="always"
+        android:orderInCategory="2"></item>
 
     <item
-        android:id="@+id/nav_2"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="profile"
-        app:showAsAction="ifRoom|withText"/>
-
-    <item
-        android:id="@+id/nav_3"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="map"
-        app:showAsAction="ifRoom|withText"/>
+        style="@style/AppTheme"
+        android:id="@+id/action_settings"
+        android:title="settings"
+        app:showAsAction="always"
+        android:orderInCategory="3"></item>
 
 </menu>

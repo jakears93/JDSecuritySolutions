@@ -1,12 +1,19 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
@@ -15,6 +22,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
@@ -22,6 +30,11 @@ import androidx.core.app.ActivityCompat;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 //TODO add surfaceview to layout
@@ -30,11 +43,7 @@ import java.util.Date;
 
 public class CameraDevice extends AppCompatActivity {
 
-    private static final int MAX_PREVIEW_WIDTH = 1280;
-    private static final int MAX_PREVIEW_HEIGHT = 720;
     private boolean allowRecord = false;
-    SurfaceTexture sft = new SurfaceTexture(0);
-    Surface sf = new Surface(sft);
     EditText room;
     SwitchCompat toggle;
     String fileName;
@@ -50,34 +59,18 @@ public class CameraDevice extends AppCompatActivity {
         screen = findViewById(R.id.video);
     }
 
-    class MyFileObserver extends FileObserver {
-
-        public MyFileObserver (String path, int mask) {
-            super(path, mask);
-        }
-
-        public void onEvent(int event, String path) {
-            Toast toast = Toast.makeText(getApplicationContext(), "File complete", Toast.LENGTH_SHORT);
-            toast.show();
-            screen.setVideoPath(fileName);
-            screen.start();
-            this.stopWatching();
-        }
-    }
-
-
+    //TODO look into AsyncTask
     public void flippedSwitch(View v) {
         if(toggle.isChecked()){
             checkPermissions();
             while(allowRecord && vidCount < 5) {
                 Thread recording = new Thread(new StartRecording());
                 recording.start();
-                try {
-                    recording.join();
-                    Log.println(Log.INFO, "Thread", "Thread joined");
-                }catch(InterruptedException ex){
-                    ex.printStackTrace();
-                }
+                   try {
+                       recording.join();
+                   } catch (InterruptedException ex) {
+                       ex.printStackTrace();
+                   }
             }
         }
     }
@@ -106,53 +99,41 @@ public class CameraDevice extends AppCompatActivity {
     }
 
     public class StartRecording implements Runnable{
-        private MediaRecorder recorder;
+        StartRecording(){}
 
-        StartRecording(){
-
-        }
-
+        //TODO enable preview
         public void record(){
-            recorder = new MediaRecorder();
+            SurfaceTexture sft = new SurfaceTexture(0);
+            Surface sf = new Surface(sft);
+            MediaRecorder recorder = new MediaRecorder();
             fileName = getFilePath();
-            recorder = new MediaRecorder();
+            File fp = getFilePath2();
+            vidCount++;
             recorder.setPreviewDisplay(sf);
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             recorder.setOrientationHint(90);
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-            recorder.setOutputFile(fileName);
-            recorder.setVideoFrameRate(10);
+            recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                Log.println(Log.INFO, "FileType", "Updated");
+                recorder.setOutputFile(fp);
+            }
+            else{
+                Log.println(Log.INFO, "FileType", "Legacy");
+                recorder.setOutputFile(fileName);
+            }
             recorder.setMaxDuration(3000);
-            recorder.setVideoSize(MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT);
-            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-   /*         recorder.setOnInfoListener(new OnInfoListener()
-            {
 
+            //TODO explore max file size instead of max duration?
+ /*           recorder.setMaxFileSize(1000000);
+            recorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
                 @Override
-                public void onInfo(MediaRecorder mr, int what, int extra)
-                {
-                    switch (what)
-                    {
-                        case MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED:
-                            Toast toast=Toast.makeText(getApplicationContext(),"Released",Toast.LENGTH_SHORT);
-                            toast.show();
-                            mr.stop();
-                            mr.reset();
-                            mr.release();
-                            break;
+                public void onInfo(MediaRecorder mr, int what, int extra) {
+                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING ) {
+                        Log.println(Log.INFO, "recorder", "stopping");
+                        mr.stop();
+                        mr.release();
                     }
-                }
-            });
-            recorder.setOnErrorListener(new MediaRecorder.OnErrorListener()
-            {
-
-                @Override
-                public void onError(MediaRecorder mr, int what, int extra)
-                {
-                    Toast toast=Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_SHORT);
-                    toast.show();
                 }
             });*/
 
@@ -166,27 +147,33 @@ public class CameraDevice extends AppCompatActivity {
                 toast.show();
             }
             try {
-                Thread.sleep(4000);
+                Thread.sleep(3000);
             }
             catch(InterruptedException ex){
                 ex.printStackTrace();
             }
+
         }
 
         public String getFilePath(){
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
-            Date custDate = new Date();
-            String roomName = room.getText().toString();
+            String roomName = room.getText().toString().replaceAll("\\s+", "");
 
-            //TEMP
             String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
-            vidCount++;
-/*
-            String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+sdf.format(custDate)+".mp4";
-*/
+
+            File fp = new File(filePath);
             return filePath;
         }
 
+        public File getFilePath2(){
+            String roomName = room.getText().toString().replaceAll("\\s+", "");
+
+            String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
+
+            File fp = new File(filePath);
+            return fp;
+        }
+
+        //TODO implement db storage
         public void storeVideoToFirebase(File video){
 
         }
