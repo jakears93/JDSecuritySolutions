@@ -1,7 +1,7 @@
 # JD Security Solutions
 ### A Environmentally Friendly Mobile Security Monitoring Solution
 
-#### Authors
+## Developers
 ------------
 Jacob Arsenault N01244276
 <br>
