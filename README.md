@@ -2,12 +2,12 @@
 ### A Environmentally Friendly Mobile Security Monitoring Solution
 <br>
 <br>
-#### Authors:
+#### Authors
+------------
 Jacob Arsenault N01244276
 <br>
 Daniel O'Donnell N01032911
-<br>
-<br>
+
 ## Description
 ------------
 This project is being developed for the Humber College Class CENG319 "Software Project"
