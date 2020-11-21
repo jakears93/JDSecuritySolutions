@@ -1,7 +1,6 @@
 # JD Security Solutions
 ### A Environmentally Friendly Mobile Security Monitoring Solution
-<br>
-<br>
+
 #### Authors
 ------------
 Jacob Arsenault N01244276
@@ -12,13 +11,14 @@ Daniel O'Donnell N01032911
 ------------
 This project is being developed for the Humber College Class CENG319 "Software Project"
 <br>
+<br>
 This project aims to:
 -	Provide users with an environmentally friendly way to monitor their spaces with security cameras
 -	Use exisiting android smartphones as secuirty cameras
 -	Store login information on external database for secure logins
 -	Store recorded video locally and on an external database for access across multiple devices
 -	Set up multiple camera nodes so several areas can be monitored at once
--	
+	
 ## Next Steps
 -------------
 1)	Store videos on firebase
