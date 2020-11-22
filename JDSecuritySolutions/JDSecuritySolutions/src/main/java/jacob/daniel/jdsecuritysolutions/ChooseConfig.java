@@ -6,22 +6,32 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ChooseConfig extends AppCompatActivity {
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+public class ChooseConfig extends BottomNavigationInflater {
 
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.choose_config);
+        super.createNavListener();
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
     }
+
 
     public void clickedViewer(View v){
         Intent intent = new Intent(ChooseConfig.this, ViewerDevice.class);
@@ -38,6 +48,8 @@ public class ChooseConfig extends AppCompatActivity {
         editor.commit();
         startActivity(intent);
     }
+
+
 
     @Override
     public void onBackPressed(){

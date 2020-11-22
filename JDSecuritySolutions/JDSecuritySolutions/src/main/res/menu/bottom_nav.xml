@@ -5,23 +5,23 @@
 
     <item
         style="@style/AppTheme"
-        android:id="@+id/action_search"
-        android:title="action search"
-        app:showAsAction="always"
-        android:orderInCategory="1"></item>
+        android:id="@+id/menu_settings"
+        android:title="@string/Settings"
+        android:icon="@drawable/jd_logo"
+        app:showAsAction="always"></item>
 
     <item
         style="@style/AppTheme"
-        android:id="@+id/action_navigation"
-        android:title="action nav"
-        app:showAsAction="always"
-        android:orderInCategory="2"></item>
+        android:id="@+id/menu_recorder"
+        android:title="@string/Recorder"
+        android:icon="@drawable/jd_logo"
+        app:showAsAction="always"></item>
 
     <item
         style="@style/AppTheme"
-        android:id="@+id/action_settings"
-        android:title="settings"
-        app:showAsAction="always"
-        android:orderInCategory="3"></item>
+        android:id="@+id/menu_viewer"
+        android:title="@string/Viewer"
+        android:icon="@drawable/jd_logo"
+        app:showAsAction="always"></item>
 
 </menu>

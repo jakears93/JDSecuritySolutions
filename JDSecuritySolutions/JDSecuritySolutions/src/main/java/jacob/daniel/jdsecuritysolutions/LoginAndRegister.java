@@ -158,7 +158,8 @@ public class LoginAndRegister extends AppCompatActivity {
 
                 if(checkUser.username.equals(user.username) && !checkUser.username.equals("")){
                     if(checkUser.password.equals(user.password)){
-                        status = userInfo.getInt("Device", 0);
+                        //status = userInfo.getInt("Device", 0);
+                        status = 0;
                     }
                     else {
                         status = -1;

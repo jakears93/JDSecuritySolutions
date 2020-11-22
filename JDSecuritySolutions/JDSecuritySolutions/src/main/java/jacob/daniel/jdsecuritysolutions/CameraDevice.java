@@ -46,7 +46,7 @@ import java.util.concurrent.Future;
 //TODO reorganize code structure
 //TODO change vidcount to value from preferences
 
-public class CameraDevice extends AppCompatActivity {
+public class CameraDevice extends BottomNavigationInflater {
 
     private boolean allowRecord = false;
     EditText room;
@@ -61,6 +61,7 @@ public class CameraDevice extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_device);
+        super.createNavListener();
         room = findViewById(R.id.RoomName);
         toggle = findViewById(R.id.toggle);
         screen = findViewById(R.id.video);
@@ -101,7 +102,7 @@ public class CameraDevice extends AppCompatActivity {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 allowRecord = true;
             }else{
-                Toast toast = Toast.makeText(getApplicationContext(), "FAILED GAINING PERMISSIONS", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(),getResources().getString(R.string.FailedPermission), Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
@@ -152,7 +153,7 @@ public class CameraDevice extends AppCompatActivity {
 
             }catch(Exception ex){
                 ex.printStackTrace();
-                Toast toast=Toast.makeText(getApplicationContext(),"Failed To Start Recorder",Toast.LENGTH_SHORT);
+                Toast toast=Toast.makeText(getApplicationContext(),getResources().getString(R.string.RecordFail),Toast.LENGTH_SHORT);
                 toast.show();
             }
             try {

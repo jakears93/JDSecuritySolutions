@@ -1,8 +1,10 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,7 +28,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
 
-public class ViewerDevice extends AppCompatActivity {
+public class ViewerDevice extends BottomNavigationInflater {
 
     BottomNavigationView bottomNav;
     String fileName;
@@ -35,19 +37,22 @@ public class ViewerDevice extends AppCompatActivity {
     int vidCount = 5;
     VideoView screen;
     SeekBar seek;
+    private SharedPreferences userInfo;
+    private SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewer_device);
-
+        super.createNavListener();
+        userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
+        editor = userInfo.edit();
         seek = (SeekBar) findViewById(R.id.videoProgress);
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int progress = seek.getProgress();
-                Log.println(Log.INFO, "Seek", "Got Progress");
                 setVideoFromProgress(progress);
             }
             @Override
@@ -60,9 +65,6 @@ public class ViewerDevice extends AppCompatActivity {
         });
 
         roomName = getResources().getString(R.string.DefaultRoom).replaceAll("\\s+", "");
-        ;
-/*        bottomNav = findViewById(R.id.navigation);
-        bottomNav.setOnNavigationItemSelectedListener(navigationItemSelectedListener);*/
         screen = findViewById(R.id.recordedVideo);
 
         setVideo();
@@ -88,24 +90,41 @@ public class ViewerDevice extends AppCompatActivity {
     //TODO add in finer seek detail, find file via progress chunk, find time via progresschunk %  screen.seekTo();
     public void setVideoFromProgress(int progress){
         screen.stopPlayback();
-        Log.println(Log.INFO, "Prelim Progress", String.valueOf(progress));
-
         if(progress == 0){
             vidIndex = 0;
         }
         else {
             vidIndex = (vidCount * progress)/100;
         }
-        Log.println(Log.INFO, "index", String.valueOf(vidIndex));
         setVideo();
     }
 
     public void setVideo() {
         int progress = (vidIndex * 100 / vidCount);
-        Log.println(Log.INFO, "Progress level", String.valueOf(progress));
         seek.setProgress(progress);
         fileName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + roomName + vidIndex + ".mp4";
         screen.setVideoPath(fileName);
         screen.start();
+    }
+
+    @Override
+    public void onBackPressed(){
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.alert_logout_title)
+                .setMessage(R.string.alert_logout_message)
+
+                .setPositiveButton(R.string.alert_yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        editor.remove("User");
+                        editor.remove("Pass");
+                        editor.remove("LoggedIn");
+                        editor.commit();
+                        Intent intent = new Intent(ViewerDevice.this, LoginAndRegister.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton(R.string.alert_cancel, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

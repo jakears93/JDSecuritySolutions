@@ -22,7 +22,6 @@
     <string name="alert_title">Exit Application</string>
     <string name="alert_message">Are you sure you want to leave the app?</string>
 
-
     !--Register Strings
     <string name="RegInfo">Registration Information</string>
     <string name="SubmitInfo">Submit</string>
@@ -37,11 +36,18 @@
     <string name="nameErrorMsg">Name must be 2 or more characters.</string>
     <string name="emailErrorMsg">Improper email format.</string>
 
-
     !--ForgotPassword Strings
     <string name="Send">Send</string>
     <string name="NoEmailFound">Email Address Does Not Exist.</string>
     <string name="WrongEmailFormat">Please use a proper email format.</string>
+
+    !--Bottom Navigation Strings
+    <string name="Settings">Settings</string>
+    <string name="Recorder">Recorder</string>
+    <string name="Viewer">Viewer</string>
+
+    !--Permissions
+    <string name="FailedPermission">FAILED GAINING PERMISSIONS</string>
 
     !--ChooseConfig Strings
     <string name="ViewerLabel">Use This Device as a Viewer</string>
@@ -51,6 +57,7 @@
     <string name="RoomNameLabel">Room Name:</string>
     <string name="RoomNameHint">Living Room</string>
     <string name="DefaultRoom">Default Room</string>
+    <string name="RecordFail">Failed to Start Recorder</string>
 
     !--ViewerDevice Strings
     <string name="LiveLabel">LIVE</string>
