@@ -55,4 +55,7 @@ This project aims to:
 14)	Implemented bottom navigation menu
 15)	Confirmed working beta release on both emulated Pixel 3 and Physical Samsung Note 9
 
+## Current Issues
+-------------
+1)	MediaRecorder's protected finalize function runs async, file sometimes doesn't save properly, not allowing for playback. Problem is not constant and may depending on the write speed of the device.  More time to develop a solution is needed.
 
