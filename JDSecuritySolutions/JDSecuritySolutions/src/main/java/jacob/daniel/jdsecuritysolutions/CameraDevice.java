@@ -1,7 +1,12 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
@@ -49,6 +54,8 @@ public class CameraDevice extends AppCompatActivity {
     String fileName;
     VideoView screen;
     int vidCount = 0;
+    private SharedPreferences userInfo;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +64,8 @@ public class CameraDevice extends AppCompatActivity {
         room = findViewById(R.id.RoomName);
         toggle = findViewById(R.id.toggle);
         screen = findViewById(R.id.video);
+        userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
+        editor = userInfo.edit();
     }
 
     //TODO look into AsyncTask
@@ -184,4 +193,25 @@ public class CameraDevice extends AppCompatActivity {
         }
 
     }//end of record class
+
+    @Override
+    public void onBackPressed(){
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.alert_logout_title)
+                .setMessage(R.string.alert_logout_message)
+
+                .setPositiveButton(R.string.alert_yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        editor.remove("User");
+                        editor.remove("Pass");
+                        editor.remove("LoggedIn");
+                        editor.commit();
+                        Intent intent = new Intent(CameraDevice.this, LoginAndRegister.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton(R.string.alert_cancel, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
 }//end of parent class

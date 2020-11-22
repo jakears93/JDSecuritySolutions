@@ -1,4 +1,12 @@
 <resources>
+    !--Generic Strings
+    <string name="alert_logout_title">Logout</string>
+    <string name="alert_logout_message">Are you sure you want to logout?</string>
+    <string name="alert_choose_title">Return to Choose Configuration</string>
+    <string name="alert_choose_message">Change device type?</string>
+    <string name="alert_yes">Yes</string>
+    <string name="alert_cancel">Cancel</string>
+
     !--Login Strings
     <string name="app_name">JDSecuritySolutions</string>
     <string name="login_title">LoginAndRegister</string>
@@ -6,10 +14,14 @@
     <string name="PassField">Password:</string>
     <string name="Login">Login</string>
     <string name="Register">Register</string>
-    <string name="Forgot">Forgot you password?</string>
+    <string name="Forgot">Forgot your password?</string>
     <string name="UserHint">Your Username</string>
     <string name="PassHint">Your Password</string>
     <string name="LoginFail">Incorrect Username/Password</string>
+    <string name="RememberMe">Remember Me</string>
+    <string name="alert_title">Exit Application</string>
+    <string name="alert_message">Are you sure you want to leave the app?</string>
+
 
     !--Register Strings
     <string name="RegInfo">Registration Information</string>
@@ -26,14 +38,14 @@
     <string name="emailErrorMsg">Improper email format.</string>
 
 
-    !--ForgotPasswword Strings
+    !--ForgotPassword Strings
     <string name="Send">Send</string>
     <string name="NoEmailFound">Email Address Does Not Exist.</string>
     <string name="WrongEmailFormat">Please use a proper email format.</string>
 
     !--ChooseConfig Strings
     <string name="ViewerLabel">Use This Device as a Viewer</string>
-    <string name="CameraLabel">Use This Device as a Camera</string>
+    <string name="CameraLabel">Start Recording from Device</string>
 
     !--CameraDevice Strings
     <string name="RoomNameLabel">Room Name:</string>

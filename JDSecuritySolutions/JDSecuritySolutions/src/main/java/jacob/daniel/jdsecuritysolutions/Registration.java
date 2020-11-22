@@ -49,7 +49,6 @@ public class Registration extends AppCompatActivity {
         DatabaseReference rootRef = database.getReference();
         final DatabaseReference userNameRef = rootRef.child("Usernames/"+user.username);
 
-        //TODO fix validate username
         readData(userNameRef, new OnGetDataListener() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
@@ -84,6 +83,7 @@ public class Registration extends AppCompatActivity {
                     ref.child("Usernames").child(user.username).setValue(user);
                     returnToLogin(v);
                 }
+
             }
             @Override
             public void onStart() {
@@ -152,12 +152,13 @@ public class Registration extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 listener.onSuccess(dataSnapshot);
-                //TODO remove listener
+                ref.removeEventListener(this);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 listener.onFailure();
+                ref.removeEventListener(this);
             }
         });
 

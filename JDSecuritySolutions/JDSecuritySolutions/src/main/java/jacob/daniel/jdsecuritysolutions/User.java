@@ -34,6 +34,13 @@ public class User{
         this.email="";
     }
 
+    public User(String name, String pass){
+        this.name="";
+        this.username=name;
+        this.password=pass;
+        this.email="";
+    }
+
     public boolean setDbReference(){
         if(!this.username.equals("")){
             this.dbRef = database.getReference().child("Usernames/"+this.username);

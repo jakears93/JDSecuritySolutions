@@ -3,9 +3,14 @@ package jacob.daniel.jdsecuritysolutions;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,17 +22,37 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
+//TODO fix record video
+//TODO landscape views
+//TODO french translation
+//TODO logout
+//TODO bottomnav
+//TODO shared pref on login (remember me button)
+//TODO login auth
+//TODO folder for video storage
+
+
 public class LoginAndRegister extends AppCompatActivity {
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private SharedPreferences userInfo;
+    private EditText usernameField;
+    private EditText passwordField;
+    private boolean remember = false;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_and_register);
+        usernameField = (EditText) findViewById(R.id.addUser);
+        passwordField = (EditText) findViewById(R.id.addPass);
+        userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
+        editor = userInfo.edit();
+        attemptAutoLogin();
     }
 
-    public void login(View v){
-        int loginCode = authenticate();
+    public void login(int loginCode){
+
         if (loginCode == 0){
             Intent intent = new Intent(LoginAndRegister.this, ChooseConfig.class);
             startActivity(intent);
@@ -56,33 +81,144 @@ public class LoginAndRegister extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private int authenticate(){
-        //Check user/pass in database. for each failed check, decrement status.  if any fail, login fails.
-        int status = -1;
-        EditText usernameField = (EditText) findViewById(R.id.addUser);
-        EditText passwordField = (EditText) findViewById(R.id.addPass);
-        String username = usernameField.getText().toString();
-        String password = passwordField.getText().toString();
-
-        //TODO validate login info with DB
-        //TODO check current device config
-        //TODO set status and errormsg
-        //Status=0 when new device, 1=viewer, 2=camera
-
-        //DEBUG
-        if(username.equals("jacob")){
-            if(password.equals("daniel")){
-                status = 0;
-            }
+    public void rememberMe(View v){
+        CheckBox check = findViewById(R.id.remember);
+        if(check.isChecked()){
+            remember = true;
+            editor.putBoolean("LoggedIn", remember);
+            editor.commit();
         }
-        else{
-            status = 0;
-        }
-        //ENDOFDEBUG
-
-        return status;
     }
 
+    public void attemptAutoLogin(){
+        //check if login remembered
+        String username = userInfo.getString("User", "");
+        String password = userInfo.getString("Pass", "");
+        boolean remembered =  userInfo.getBoolean("LoggedIn", false);
+        if(remembered && !password.equals("") && !username.equals("")){
+            usernameField.setText(username, EditText.BufferType.EDITABLE);
+            passwordField.setText(password, EditText.BufferType.EDITABLE);
+            authenticate(findViewById(R.id.submitButton));
+        }
+    }
+
+    private void storeUserLocally(){
+        if(remember) {
+            String username = usernameField.getText().toString();
+            String password = passwordField.getText().toString();
+            //add all values to userInfo
+            editor.putString("User", username);
+            editor.putString("Pass", password);
+            editor.putBoolean("LoggedIn", remember);
+            editor.commit();
+        }
+    }
+
+
+    public void authenticate(View v){
+        //Check user/pass in database. for each failed check, decrement status.  if any fail, login fails.
+        String username = usernameField.getText().toString();
+        String password = passwordField.getText().toString();
+        User user = new User(username, password);
+        storeUserLocally();
+
+        //Check firebase
+        checkDbLogin(user);
+    }
+
+    public void checkDbLogin(final User user){
+        DatabaseReference rootRef = database.getReference();
+        final DatabaseReference userNameRef = rootRef.child("Usernames/"+user.username);
+
+        readData(userNameRef, new LoginAndRegister.OnGetDataListener() {
+            int status;
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                User checkUser = new User();
+                try {
+                    HashMap<String, Object> temp = (HashMap<String, Object>) dataSnapshot.getValue();
+                    for (String key : temp.keySet()) {
+                        String tempStr = String.valueOf(temp.get(key));
+                        if(key.equals("name")){
+                            checkUser.name=tempStr;
+                        }
+                        else if(key.equals("email")){
+                            checkUser.email=tempStr;
+                        }
+                        else if(key.equals("password")){
+                            checkUser.password=tempStr;
+                        }
+                        else if(key.equals("username")){
+                            checkUser.username=tempStr;
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                if(checkUser.username.equals(user.username) && !checkUser.username.equals("")){
+                    if(checkUser.password.equals(user.password)){
+                        status = userInfo.getInt("Device", 0);
+                    }
+                    else {
+                        status = -1;
+                    }
+                }
+                else{
+                    status = -1;
+                }
+                login(status);
+            }
+            @Override
+            public void onStart() {
+            }
+
+            @Override
+            public void onFailure() {
+            }
+        });
+    }
+
+    public void readData(final DatabaseReference ref, final LoginAndRegister.OnGetDataListener listener) {
+        final boolean hasFinished = false;
+        listener.onStart();
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                listener.onSuccess(dataSnapshot);
+                ref.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onFailure();
+                ref.removeEventListener(this);
+            }
+        });
+    }
+
+    public interface OnGetDataListener {
+        //this is for callbacks
+        void onSuccess(DataSnapshot dataSnapshot);
+        void onStart();
+        void onFailure();
+    }
+
+    @Override
+    public void onBackPressed(){
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.alert_title)
+                .setMessage(R.string.alert_message)
+
+                .setPositiveButton(R.string.alert_yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finishAffinity();
+                    }
+                })
+                .setNegativeButton(R.string.alert_cancel, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
 
 
 }

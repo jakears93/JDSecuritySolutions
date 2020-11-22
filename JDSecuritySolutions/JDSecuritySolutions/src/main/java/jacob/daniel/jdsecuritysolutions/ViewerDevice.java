@@ -1,6 +1,7 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -100,12 +101,11 @@ public class ViewerDevice extends AppCompatActivity {
     }
 
     public void setVideo() {
-        int progress = (vidIndex*100/vidCount);
+        int progress = (vidIndex * 100 / vidCount);
         Log.println(Log.INFO, "Progress level", String.valueOf(progress));
         seek.setProgress(progress);
-        fileName =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidIndex+".mp4";
+        fileName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + roomName + vidIndex + ".mp4";
         screen.setVideoPath(fileName);
         screen.start();
     }
-
 }
