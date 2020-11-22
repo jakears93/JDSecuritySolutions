@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,9 +25,23 @@ public class ChooseConfig extends BottomNavigationInflater {
     private BottomNavigationView bottomNavigationView;
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.choose_config);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.choose_config_landscape);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.choose_config);
+        Configuration orientation = getResources().getConfiguration();
+        onConfigurationChanged(orientation);
         super.createNavListener();
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();

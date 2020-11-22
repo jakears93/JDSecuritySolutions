@@ -1,6 +1,7 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -32,13 +33,27 @@ public class Registration extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registration);
+        Configuration orientation = getResources().getConfiguration();
+        onConfigurationChanged(orientation);
     }
 
     public void submitInfo(View v){
         User user = validateInfo();
         if(status==0) {
             checkIfUserExists(v, user);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.registration);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.registration_landscape);
         }
     }
 

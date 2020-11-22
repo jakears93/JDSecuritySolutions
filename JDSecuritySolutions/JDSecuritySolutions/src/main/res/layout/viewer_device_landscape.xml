@@ -10,57 +10,41 @@
 
     <VideoView
         android:id="@+id/recordedVideo"
-        android:layout_width="match_parent"
-        android:layout_height="400sp"
+        android:layout_width="fill_parent"
+        android:layout_height="200sp"
         app:layout_constraintBottom_toTopOf="@+id/navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="-1dp" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <SeekBar
         android:id="@+id/videoProgress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
+        android:layout_width="fill_parent"
+        android:layout_height="29dp"
         android:max="100"
         android:min="0"
         android:progressDrawable="@drawable/seekbar_progress_style"
         android:scaleY="0.5"
         android:thumb="@drawable/thumb"
         android:thumbTint="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/navigation"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recordedVideo"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.092" />
 
     <TextView
         android:id="@+id/LiveLabel"
         style="@style/TitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="116dp"
         android:text="@string/LiveLabel"
         android:textColor="#FF0000"
-        app:layout_constraintBottom_toTopOf="@+id/navigation"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/RoomNameLabel"
+        app:layout_constraintEnd_toStartOf="@+id/RoomNameLabel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/videoProgress"
+        app:layout_constraintTop_toTopOf="@+id/RoomNameLabel"
         app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/RoomNameLabel"
-        style="@style/TitleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/DefaultRoom"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/navigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/LiveLabel"
-        app:layout_constraintVertical_bias="0.106" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
@@ -74,15 +58,15 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" >
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigationView"
-        android:layout_width="0dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/mainBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -90,6 +74,19 @@
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:menu="@menu/bottom_nav"/>
+
+    <TextView
+        android:id="@+id/RoomNameLabel"
+        style="@style/TitleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/DefaultRoom"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.671"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/videoProgress" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

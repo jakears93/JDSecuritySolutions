@@ -2,23 +2,18 @@ package jacob.daniel.jdsecuritysolutions;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileObserver;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
@@ -27,19 +22,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 
 //TODO add surfaceview to layout
@@ -57,10 +43,24 @@ public class CameraDevice extends BottomNavigationInflater {
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
 
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.camera_device);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.camera_device_landscape);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_device);
+        Configuration orientation = getResources().getConfiguration();
+        onConfigurationChanged(orientation);
         super.createNavListener();
         room = findViewById(R.id.RoomName);
         toggle = findViewById(R.id.toggle);

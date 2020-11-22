@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="jacob.daniel.jdsecuritysolutions.CameraDevice"
+    android:background="@color/mainBackground">
+
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/toggle"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:checked="false"
+        android:onClick="flippedSwitch"
+        app:layout_constraintBottom_toTopOf="@+id/navigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.11"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/video"
+        app:layout_constraintVertical_bias="0.457" />
+
+    <TextView
+        android:id="@+id/CameraSwitchLabel"
+        style="@style/LabelTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="@string/CameraLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/toggle"
+        app:layout_constraintStart_toEndOf="@+id/toggle"
+        app:layout_constraintTop_toTopOf="@+id/toggle"
+        app:layout_constraintVertical_bias="0.545" />
+
+    <TextView
+        android:id="@+id/RoomNameLabel"
+        style="@style/LabelTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/RoomNameLabel"
+        app:layout_constraintBottom_toTopOf="@+id/navigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.608"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/video"
+        app:layout_constraintVertical_bias="0.466" />
+
+    <EditText
+        android:id="@+id/RoomName"
+        style="@style/EditTextStyle"
+        android:layout_width="157dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="20dp"
+        android:hint="@string/RoomNameHint"
+        android:inputType="text"
+        android:text="@string/DefaultRoom"
+        app:layout_constraintBottom_toBottomOf="@+id/RoomNameLabel"
+        app:layout_constraintStart_toEndOf="@+id/RoomNameLabel"
+        app:layout_constraintTop_toTopOf="@+id/RoomNameLabel" />
+
+    <VideoView
+        android:id="@+id/video"
+        android:layout_width="fill_parent"
+        android:layout_height="200sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/mainBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:itemBackground="@color/colorPrimary"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/bottom_nav"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

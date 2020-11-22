@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
@@ -43,12 +44,26 @@ public class LoginAndRegister extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_and_register);
+        Configuration orientation = getResources().getConfiguration();
+        onConfigurationChanged(orientation);
         usernameField = (EditText) findViewById(R.id.addUser);
         passwordField = (EditText) findViewById(R.id.addPass);
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
         attemptAutoLogin();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_login_and_register);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_login_and_register_landscape);
+        }
     }
 
     public void login(int loginCode){

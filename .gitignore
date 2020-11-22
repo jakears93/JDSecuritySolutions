@@ -1,5 +1,21 @@
+#JD Security Solutions
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+JDSecuritySolutions/JDSecuritySolutions/build/
 ProjectNotes.txt
 Milestone1Drafts/
+Milestone2/
 JDSecuritySolutionsMilestone1/
 milestone2-sectionsA&B-v1.0.pdf
-JDSecuritySolutions/JDSecuritySolutions/build/

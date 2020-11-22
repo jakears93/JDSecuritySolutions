@@ -1,6 +1,7 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -44,6 +45,10 @@ public abstract class BottomNavigationInflater extends AppCompatActivity {
                 }
             });
         }
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
 }

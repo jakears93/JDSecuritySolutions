@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,7 +44,8 @@ public class ViewerDevice extends BottomNavigationInflater {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.viewer_device);
+        Configuration orientation = getResources().getConfiguration();
+        onConfigurationChanged(orientation);
         super.createNavListener();
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
@@ -63,6 +65,7 @@ public class ViewerDevice extends BottomNavigationInflater {
 
             }
         });
+
 
         roomName = getResources().getString(R.string.DefaultRoom).replaceAll("\\s+", "");
         screen = findViewById(R.id.recordedVideo);
@@ -85,6 +88,19 @@ public class ViewerDevice extends BottomNavigationInflater {
                 }
             }
         });
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.viewer_device);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.viewer_device_landscape);
+        }
     }
 
     //TODO add in finer seek detail, find file via progress chunk, find time via progresschunk %  screen.seekTo();

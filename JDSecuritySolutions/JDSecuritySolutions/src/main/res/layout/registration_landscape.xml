@@ -34,45 +34,85 @@
     <ScrollView
         android:id="@+id/scrollRegister"
         android:layout_width="fill_parent"
-        android:layout_height="350dp"
+        android:layout_height="167dp"
         android:layout_marginTop="10dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintEnd_toStartOf="@+id/submitButton"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/regInfoLabel"
         app:layout_constraintVertical_bias="0.0">
 
-        <LinearLayout
+        <GridLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:columnCount="2"
             android:orientation="vertical"
-            android:layout_marginLeft="10dp">
+            android:rowCount="7">
+
+            <TextView />
 
             <TextView
                 android:id="@+id/fullName"
                 style="@style/LabelTextStyle"
-                android:layout_marginTop="15dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="15dp"
                 android:text="@string/NameField" />
+
+            <TextView
+                android:id="@+id/userName"
+                style="@style/LabelTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="15dp"
+                android:text="@string/UserField" />
+
+            <TextView
+                android:id="@+id/password"
+                style="@style/LabelTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="15dp"
+                android:text="@string/PassField" />
+
+            <TextView
+                android:id="@+id/confirmPassword"
+                style="@style/LabelTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="15dp"
+                android:text="@string/ConfirmPassField" />
+
+
+            <TextView
+                android:id="@+id/email"
+                style="@style/LabelTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="15dp"
+                android:text="@string/EmailField" />
+
+            <TextView />
+
+            <TextView />
+
             <EditText
                 android:id="@+id/fullNameInput"
                 style="@style/EditTextStyle"
                 android:layout_width="200sp"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:layout_gravity="bottom"
                 android:hint="@string/NameHint"
                 android:inputType="text" />
-
-            <TextView
-                android:id="@+id/userName"
-                style="@style/LabelTextStyle"
-                android:layout_marginTop="15dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/UserField" />
 
             <EditText
                 android:id="@+id/userNameInput"
@@ -82,13 +122,6 @@
                 android:layout_centerInParent="true"
                 android:hint="@string/UserHint"
                 android:inputType="text" />
-            <TextView
-                android:id="@+id/password"
-                style="@style/LabelTextStyle"
-                android:layout_marginTop="15dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/PassField" />
 
             <EditText
                 android:id="@+id/passwordInput"
@@ -98,13 +131,6 @@
                 android:layout_centerInParent="true"
                 android:hint="@string/PassHint"
                 android:inputType="textPassword" />
-            <TextView
-                android:id="@+id/confirmPassword"
-                style="@style/LabelTextStyle"
-                android:layout_marginTop="15dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ConfirmPassField" />
 
             <EditText
                 android:id="@+id/confirmPasswordInput"
@@ -115,14 +141,6 @@
                 android:hint="@string/PassHint"
                 android:inputType="textPassword" />
 
-            <TextView
-                android:id="@+id/email"
-                style="@style/LabelTextStyle"
-                android:layout_marginTop="15dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/EmailField" />
-
             <EditText
                 android:id="@+id/emailInput"
                 style="@style/EditTextStyle"
@@ -130,20 +148,24 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:hint="@string/EmailHint"
-                android:inputType="text"/>
-        </LinearLayout>
+                android:inputType="text" />
+
+            <TextView />
+
+        </GridLayout>
     </ScrollView>
 
     <Button
         android:id="@+id/submitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/SubmitInfo"
         android:onClick="submitInfo"
+        android:text="@string/SubmitInfo"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.934"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollRegister" />
+        app:layout_constraintTop_toBottomOf="@+id/regInfoLabel"
+        app:layout_constraintVertical_bias="0.466" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

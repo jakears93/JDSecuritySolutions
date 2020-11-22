@@ -1,0 +1,65 @@
+<resources>
+    !--Generic Strings
+    <string name="alert_logout_title">Se déconnecter</string>
+    <string name="alert_logout_message">Êtes-vous sûr de vouloir vous déconnecter?</string>
+    <string name="alert_choose_title">Revenir à Choisir la configuration</string>
+    <string name="alert_choose_message">Changer de type d\'appareil?</string>
+    <string name="alert_yes">Oui</string>
+    <string name="alert_cancel">Annuler</string>
+
+    !--Login Strings
+    <string name="app_name">JDSecuritySolutions</string>
+    <string name="login_title">Se connecter et s\'inscrire</string>
+    <string name="UserField">Nom d\'utilisateur:</string>
+    <string name="PassField">Mot de passe:</string>
+    <string name="Login">S\'identifier</string>
+    <string name="Register">S\'inscrire</string>
+    <string name="Forgot">Mot de passe oublié?</string>
+    <string name="UserHint">Ton nom d\'utilisateur</string>
+    <string name="PassHint">Votre mot de passe</string>
+    <string name="LoginFail">Nom d\'utilisateur / Mot de passe incorrect</string>
+    <string name="RememberMe">Souviens-toi de moi</string>
+    <string name="alert_title">EQuitter l\'application</string>
+    <string name="alert_message">Voulez-vous vraiment quitter l\'application?</string>
+
+    !--Register Strings
+    <string name="RegInfo">Information d\'inscription</string>
+    <string name="SubmitInfo">Soumettre</string>
+    <string name="NameField">Nom complet:</string>
+    <string name="NameHint">Joe Smith</string>
+    <string name="ConfirmPassField">Confirm Password:</string>
+    <string name="EmailField">Confirmez le mot de passe:</string>
+    <string name="EmailHint">123@gmail.com</string>
+    <string name="usernameErrorMsg">Nom d\'utilisateur déjà pris.</string>
+    <string name="passwordErrorMsg">Le mot de passe doit contenir 8 caractères ou plus.</string>
+    <string name="confirmPasswordErrorMsg">Les mots de passe doivent correspondre.</string>
+    <string name="nameErrorMsg">Le nom doit comporter 2 caractères ou plus.</string>
+    <string name="emailErrorMsg">Format d\'e-mail incorrect.</string>
+
+    !--ForgotPassword Strings
+    <string name="Send">Envoyer</string>
+    <string name="NoEmailFound">L\'adresse e-mail n\'existe pas.</string>
+    <string name="WrongEmailFormat">Veuillez utiliser un format de courrier électronique approprié.</string>
+
+    !--Bottom Navigation Strings
+    <string name="Settings">Réglages</string>
+    <string name="Recorder">Enregistreur</string>
+    <string name="Viewer">Téléspectatrice</string>
+
+    !--Permissions
+    <string name="FailedPermission">ÉCHEC DES PERMISSIONS D\'OBTENTION</string>
+
+    !--ChooseConfig Strings
+    <string name="ViewerLabel">Utiliser cet appareil comme visionneuse</string>
+    <string name="CameraLabel">Démarrer l\'enregistrement à partir de l\'appareil</string>
+
+    !--CameraDevice Strings
+    <string name="RoomNameLabel">Nom de la salle:</string>
+    <string name="RoomNameHint">Salon</string>
+    <string name="DefaultRoom">Chambre par défaut</string>
+    <string name="RecordFail">Échec du démarrage de l\'enregistreur</string>
+
+    !--ViewerDevice Strings
+    <string name="LiveLabel">VIVRE</string>
+
+</resources>
