@@ -27,6 +27,12 @@ import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 //TODO add surfaceview to layout
@@ -38,11 +44,10 @@ public class CameraDevice extends BottomNavigationInflater {
     private boolean allowRecord = false;
     EditText room;
     SwitchCompat toggle;
-    String fileName;
     VideoView screen;
-    int vidCount = 0;
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
+    Callable recordManager;
 
 
     @Override
@@ -70,18 +75,19 @@ public class CameraDevice extends BottomNavigationInflater {
         editor = userInfo.edit();
     }
 
+    private void recordCamera(){
+
+    }
+
     //TODO look into AsyncTask
     public void flippedSwitch(View v) {
         if(toggle.isChecked()){
             checkPermissions();
-            while(allowRecord && vidCount < 5) {
-                Thread recording = new Thread(new StartRecording());
-                recording.start();
-                   try {
-                       recording.join();
-                   } catch (InterruptedException ex) {
-                       ex.printStackTrace();
-                   }
+            if(allowRecord) {
+                //create callable, exit function
+                ExecutorService executor = Executors.newFixedThreadPool(1);
+                recordManager = new RecordingManager(getApplicationContext(), room);
+                executor.submit(recordManager);
             }
         }
     }
@@ -109,108 +115,7 @@ public class CameraDevice extends BottomNavigationInflater {
         }
     }
 
-    public class StartRecording implements Runnable{
-        StartRecording(){}
 
-        boolean vidRecording = true;
-
-        //TODO enable preview
-        public void record(){
-            SurfaceTexture sft = new SurfaceTexture(0);
-            Surface sf = new Surface(sft);
-            MediaRecorder recorder = new MediaRecorder();
-            File fp = getFilePath2();
-            vidCount++;
-            recorder.setPreviewDisplay(sf);
-            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            recorder.setOrientationHint(90);
-            recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                Log.println(Log.INFO, "FileType", "Updated");
-                recorder.setOutputFile(fp);
-            }
-            else{
-                Log.println(Log.INFO, "FileType", "Legacy");
-                recorder.setOutputFile(fileName);
-            }
-            recorder.setMaxDuration(5000);
-
-/*
-            //TODO explore max file size instead of max duration?
-            recorder.setMaxFileSize(1000000);
-            recorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
-                @Override
-                public void onInfo(MediaRecorder mr, int what, int extra) {
-                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING ) {
-                        Log.println(Log.INFO, "recorder", "stopping");
-                        mr.stop();
-                        mr.release();
-                        vidRecording = false;
-                    }
-                }
-            });
-*/
-
-            try {
-                recorder.prepare();
-                recorder.start();
-
-            }catch(Exception ex){
-                ex.printStackTrace();
-                Toast toast=Toast.makeText(getApplicationContext(),getResources().getString(R.string.RecordFail),Toast.LENGTH_SHORT);
-                toast.show();
-            }
-            try {
-                Thread.sleep(4000);
-                recorder.stop();
-                recorder.release();
-            }
-            catch(InterruptedException ex){
-                ex.printStackTrace();
-            }
-
-        }
-
-        public String getFilePath(){
-            String roomName = room.getText().toString().replaceAll("\\s+", "");
-
-            String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
-
-            File fp = new File(filePath);
-            try {
-                fp.createNewFile();
-            }catch(IOException ex){
-                ex.printStackTrace();
-            }
-            return filePath;
-        }
-
-        public File getFilePath2(){
-            String roomName = room.getText().toString().replaceAll("\\s+", "");
-
-            String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
-
-            File fp = new File(filePath);
-            try {
-                fp.createNewFile();
-            }catch(IOException ex){
-                ex.printStackTrace();
-            }
-            return fp;
-        }
-
-        //TODO implement db storage
-        public void storeVideoToFirebase(File video){
-
-        }
-
-        public void run(){
-            Looper.prepare();
-            record();
-        }
-
-    }//end of record class
 
     @Override
     public void onBackPressed(){
