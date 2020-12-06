@@ -63,7 +63,7 @@
         app:layout_constraintTop_toTopOf="@+id/RoomNameLabel"
         app:layout_constraintVertical_bias="0.526" />
 
-    <VideoView
+    <SurfaceView
         android:id="@+id/video"
         android:layout_width="fill_parent"
         android:layout_height="500dp"

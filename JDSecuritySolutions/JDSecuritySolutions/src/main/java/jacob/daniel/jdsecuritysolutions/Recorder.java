@@ -10,6 +10,8 @@ import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -25,10 +27,13 @@ public class Recorder implements Callable<Integer> {
     static int vidCount = 0;
     EditText room;
     Context context;
+    SurfaceView screen;
+    SurfaceHolder surfaceHolder;
 
-    Recorder(Context context, EditText room){
+    Recorder(Context context, SurfaceView screen, EditText room){
         this.room = room;
         this.context = context;
+        this.screen = screen;
     }
 
     private Integer doneRecording = -1;
@@ -45,14 +50,16 @@ public class Recorder implements Callable<Integer> {
     public void record(){
         SurfaceTexture sft = new SurfaceTexture(0);
         Surface sf = new Surface(sft);
+        surfaceHolder = screen.getHolder();
         MediaRecorder recorder = new MediaRecorder();
+        recorder.setPreviewDisplay(surfaceHolder.getSurface());
         File fp = getFilePath2();
         vidCount++;
-        recorder.setPreviewDisplay(sf);
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         recorder.setOrientationHint(90);
         recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             Log.println(Log.INFO, "FileType", "Updated");
             recorder.setOutputFile(fp);

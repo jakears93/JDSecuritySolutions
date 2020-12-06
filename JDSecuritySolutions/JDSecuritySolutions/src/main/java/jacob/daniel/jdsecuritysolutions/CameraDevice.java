@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -44,7 +45,7 @@ public class CameraDevice extends BottomNavigationInflater {
     private boolean allowRecord = false;
     EditText room;
     SwitchCompat toggle;
-    VideoView screen;
+    SurfaceView screen;
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
     RecordingManager recordManager;
@@ -86,7 +87,7 @@ public class CameraDevice extends BottomNavigationInflater {
             if(allowRecord) {
                 //create callable, exit function
                 ExecutorService executor = Executors.newFixedThreadPool(1);
-                recordManager = new RecordingManager(getApplicationContext(), room, allowRecord);
+                recordManager = new RecordingManager(getApplicationContext(), screen, room, allowRecord);
                 executor.submit(recordManager);
             }
         }
