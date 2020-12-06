@@ -26,7 +26,6 @@ import java.util.Map;
 public class Registration extends AppCompatActivity {
 
     EditText info;
-    final FirebaseDatabase database = FirebaseDatabase.getInstance();
     int status = 0;
     boolean exists = false;
 
@@ -60,8 +59,10 @@ public class Registration extends AppCompatActivity {
     //TODO move checkIfUserExists method to user class
 
     public void checkIfUserExists(final View v, final User user){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-        DatabaseReference rootRef = database.getReference();
+
+        final DatabaseReference rootRef = database.getReference();
         final DatabaseReference userNameRef = rootRef.child("Usernames/"+user.username);
 
         readData(userNameRef, new OnGetDataListener() {
@@ -94,14 +95,15 @@ public class Registration extends AppCompatActivity {
                 }
                 else{
                     //Submit info to firebase
-                    DatabaseReference ref = database.getReference();
-                    ref.child("Usernames").child(user.username).setValue(user);
+                    rootRef.child("Usernames").child(user.username).setValue(user);
                     returnToLogin(v);
                 }
 
             }
             @Override
             public void onStart() {
+                Toast toast=Toast.makeText(getApplicationContext(),"starting",Toast.LENGTH_SHORT);
+                toast.show();
             }
 
             @Override
@@ -166,6 +168,8 @@ public class Registration extends AppCompatActivity {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Toast toast=Toast.makeText(getApplicationContext(),getResources().getString(R.string.LoginFail),Toast.LENGTH_SHORT);
+                toast.show();
                 listener.onSuccess(dataSnapshot);
                 ref.removeEventListener(this);
             }

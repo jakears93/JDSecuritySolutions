@@ -26,6 +26,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 
 import java.io.File;
+import java.io.IOException;
 
 
 //TODO add surfaceview to layout
@@ -111,19 +112,20 @@ public class CameraDevice extends BottomNavigationInflater {
     public class StartRecording implements Runnable{
         StartRecording(){}
 
+        boolean vidRecording = true;
+
         //TODO enable preview
         public void record(){
             SurfaceTexture sft = new SurfaceTexture(0);
             Surface sf = new Surface(sft);
             MediaRecorder recorder = new MediaRecorder();
-            fileName = getFilePath();
             File fp = getFilePath2();
             vidCount++;
             recorder.setPreviewDisplay(sf);
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             recorder.setOrientationHint(90);
-            recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+            recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
              if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 Log.println(Log.INFO, "FileType", "Updated");
                 recorder.setOutputFile(fp);
@@ -132,10 +134,11 @@ public class CameraDevice extends BottomNavigationInflater {
                 Log.println(Log.INFO, "FileType", "Legacy");
                 recorder.setOutputFile(fileName);
             }
-            recorder.setMaxDuration(3000);
+            recorder.setMaxDuration(5000);
 
+/*
             //TODO explore max file size instead of max duration?
- /*           recorder.setMaxFileSize(1000000);
+            recorder.setMaxFileSize(1000000);
             recorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
                 @Override
                 public void onInfo(MediaRecorder mr, int what, int extra) {
@@ -143,9 +146,11 @@ public class CameraDevice extends BottomNavigationInflater {
                         Log.println(Log.INFO, "recorder", "stopping");
                         mr.stop();
                         mr.release();
+                        vidRecording = false;
                     }
                 }
-            });*/
+            });
+*/
 
             try {
                 recorder.prepare();
@@ -157,7 +162,9 @@ public class CameraDevice extends BottomNavigationInflater {
                 toast.show();
             }
             try {
-                Thread.sleep(3000);
+                Thread.sleep(4000);
+                recorder.stop();
+                recorder.release();
             }
             catch(InterruptedException ex){
                 ex.printStackTrace();
@@ -171,6 +178,11 @@ public class CameraDevice extends BottomNavigationInflater {
             String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
 
             File fp = new File(filePath);
+            try {
+                fp.createNewFile();
+            }catch(IOException ex){
+                ex.printStackTrace();
+            }
             return filePath;
         }
 
@@ -180,6 +192,11 @@ public class CameraDevice extends BottomNavigationInflater {
             String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
 
             File fp = new File(filePath);
+            try {
+                fp.createNewFile();
+            }catch(IOException ex){
+                ex.printStackTrace();
+            }
             return fp;
         }
 
