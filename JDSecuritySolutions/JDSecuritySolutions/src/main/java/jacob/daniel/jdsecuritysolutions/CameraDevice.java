@@ -47,7 +47,7 @@ public class CameraDevice extends BottomNavigationInflater {
     VideoView screen;
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
-    Callable recordManager;
+    RecordingManager recordManager;
 
 
     @Override
@@ -86,9 +86,12 @@ public class CameraDevice extends BottomNavigationInflater {
             if(allowRecord) {
                 //create callable, exit function
                 ExecutorService executor = Executors.newFixedThreadPool(1);
-                recordManager = new RecordingManager(getApplicationContext(), room);
+                recordManager = new RecordingManager(getApplicationContext(), room, allowRecord);
                 executor.submit(recordManager);
             }
+        }
+        else if(!toggle.isChecked()){
+            recordManager.setAllowRecord(false);
         }
     }
 
