@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -16,15 +17,26 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
+import android.util.Rational;
+import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.camera.core.CameraX;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureConfig;
+import androidx.camera.core.Preview;
+import androidx.camera.core.PreviewConfig;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.LifecycleOwner;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +62,8 @@ public class CameraDevice extends BottomNavigationInflater {
     private SharedPreferences.Editor editor;
     RecordingManager recordManager;
 
+    TextureView textureView;
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -72,15 +86,11 @@ public class CameraDevice extends BottomNavigationInflater {
         room = findViewById(R.id.RoomName);
         toggle = findViewById(R.id.toggle);
         screen = findViewById(R.id.video);
+
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
     }
 
-    private void recordCamera(){
-
-    }
-
-    //TODO look into AsyncTask
     public void flippedSwitch(View v) {
         if(toggle.isChecked()){
             checkPermissions();
@@ -104,7 +114,6 @@ public class CameraDevice extends BottomNavigationInflater {
         else{
             allowRecord = true;
         }
-
     }
 
     @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -118,8 +127,6 @@ public class CameraDevice extends BottomNavigationInflater {
             }
         }
     }
-
-
 
     @Override
     public void onBackPressed(){

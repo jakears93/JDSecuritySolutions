@@ -61,6 +61,7 @@
 
     !--ViewerDevice Strings
     <string name="LiveLabel">LIVE</string>
+    <string name="NoMoreVideos">You have reached the end of your recording.</string>
 
 
 

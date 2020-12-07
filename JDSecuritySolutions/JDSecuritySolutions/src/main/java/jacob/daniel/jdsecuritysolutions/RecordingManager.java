@@ -1,9 +1,12 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.widget.EditText;
+
+import androidx.camera.core.CameraX;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +18,10 @@ public class RecordingManager implements Callable {
     EditText room;
     Context context;
     SurfaceView screen;
-    public boolean allowRecord;
+    public static boolean allowRecord;
+    public static boolean startRecord;
+    public static boolean startPrep;
+
 
     RecordingManager(Context context, SurfaceView screen, EditText room, boolean allow){
         this.context = context;
@@ -24,22 +30,30 @@ public class RecordingManager implements Callable {
         this.screen = screen;
     }
 
+    //prep next worker when other worker is recording.
+    //TODO change to 1 recorder thread that continuously writes to new files.
     @Override
     public Object call() throws Exception {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Callable<Integer> recorder = new Recorder(context, screen, room);
-        executor.submit(recorder);
+        this.startRecord = true;
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Callable<Boolean> recorder = new Recorder(context, screen, room);
+/*        Callable<Boolean> recorder2 = new Recorder(context, screen, room);*/
+        Log.println(Log.INFO, "Manager", "Starting Thread 1");
+        Future<Boolean> future = executor.submit(recorder);
+/*        Thread.sleep(100);
+        Log.println(Log.INFO, "Manager", "Starting Thread 2");
+        Future<Boolean> future2 = executor.submit(recorder2);*/
+
         while(allowRecord){
-            Future<Integer> future = executor.submit(recorder);
-            while(!future.isDone()){
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            if(future.isDone()){
+                Log.println(Log.INFO, "Manager", "Starting Thread 1");
+                future = executor.submit(recorder);
             }
+/*            if(future2.isDone()){
+                Log.println(Log.INFO, "Manager", "Starting Thread 2");
+                future2 = executor.submit(recorder2);
+            }*/
         }
-        screen.getHolder().getSurface().release();
         return null;
     }
 

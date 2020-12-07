@@ -21,96 +21,138 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-public class Recorder implements Callable<Integer> {
+//TODO uncomment for working version
+public class Recorder implements Callable<Boolean> {
 
+    private Boolean doneRecording;
     String fileName;
     static int vidCount = 0;
     EditText room;
     Context context;
     SurfaceView screen;
     SurfaceHolder surfaceHolder;
+    MediaRecorder recorder;
+    File fp;
+    static boolean end = false;
+
 
     Recorder(Context context, SurfaceView screen, EditText room){
         this.room = room;
         this.context = context;
         this.screen = screen;
+        String roomName = room.getText().toString().replaceAll("\\s+", "");
+        File dir =  new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName);
+        dir.mkdirs();
     }
-
-    private Integer doneRecording = -1;
 
     @Override
-    public Integer call() throws Exception {
+    public Boolean call() throws Exception {
+        this.doneRecording = false;
+        prepare();
+        while(RecordingManager.startRecord == false){
+            Thread.sleep(10);
+        }
+        RecordingManager.startRecord = false;
+        this.end = false;
         record();
-        return doneRecording;
+        return this.doneRecording;
     }
 
-    boolean vidRecording = true;
-
-    //TODO enable preview
-    public void record(){
-        SurfaceTexture sft = new SurfaceTexture(0);
-        Surface sf = new Surface(sft);
+    public void prepare(){
+        recorder = new MediaRecorder();
         surfaceHolder = screen.getHolder();
-        MediaRecorder recorder = new MediaRecorder();
-        recorder.setPreviewDisplay(surfaceHolder.getSurface());
-        File fp = getFilePath2();
-        vidCount++;
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         recorder.setOrientationHint(90);
-        recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+        recorder.setPreviewDisplay(surfaceHolder.getSurface());
+
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             Log.println(Log.INFO, "FileType", "Updated");
+            fp = getFilePath2();
+            Log.println(Log.INFO, "FileName", fp.toString());
             recorder.setOutputFile(fp);
         }
         else{
             Log.println(Log.INFO, "FileType", "Legacy");
+            String fileName = getFilePath();
+            Log.println(Log.INFO, "FileName", fileName);
             recorder.setOutputFile(fileName);
         }
-        recorder.setMaxDuration(1000);
 
-/*
-            //TODO explore max file size instead of max duration?
-            recorder.setMaxFileSize(1000000);
-            recorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
-                @Override
-                public void onInfo(MediaRecorder mr, int what, int extra) {
-                    if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING ) {
-                        Log.println(Log.INFO, "recorder", "stopping");
-                        mr.stop();
-                        mr.release();
-                        vidRecording = false;
-                    }
-                }
-            });
-*/
+        //recorder.setMaxDuration(2000);
+
+        recorder.setMaxFileSize(3000000);
+        MyListener listener = new MyListener();
+        recorder.setOnInfoListener(listener);
 
         try {
             recorder.prepare();
-            recorder.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-        }catch(Exception ex){
-            ex.printStackTrace();
-/*            Toast toast=Toast.makeText(context.getString(R.string.RecordFail),Toast.LENGTH_SHORT);
-            toast.show();*/
-        }
-        try {
-            Thread.sleep(1000);
-            recorder.stop();
-            recorder.release();
-            doneRecording = 1;
-        }
-        catch(InterruptedException ex){
-            ex.printStackTrace();
+    class MyListener implements MediaRecorder.OnInfoListener{
+        @Override
+        public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
+            if(RecordingManager.allowRecord == false){
+                recorder.stop();
+                recorder.release();
+                Recorder.end = true;
+                fp.delete();
+                Log.println(Log.INFO, "Deleted Unfinished File", fp.toString());
+                vidCount--;
+                return;
+            }
+            if(i==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING){
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                    Log.println(Log.INFO, "FileType", "Updated");
+                    fp = getFilePath2();
+                    Log.println(Log.INFO, "FileName", fp.toString());
+                    try {
+                        recorder.setNextOutputFile(fp);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
 
     }
 
-    public String getFilePath(){
+    public void record(){
+        Log.println(Log.INFO, "MediaRecorder", "Started Recording "+fp.toString());
+        recorder.start();
+
+        while(!end){
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+/*        try {
+            Thread.sleep(2000);
+            Log.println(Log.INFO, "MediaRecorder", "Stopping Recording"+fp.toString());
+            recorder.stop();
+            recorder.release();
+        }
+        catch(InterruptedException ex){
+            ex.printStackTrace();
+        }
+        doneRecording = true;
+        RecordingManager.startRecord = true;*/
+
+    }
+
+    public synchronized String getFilePath(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
-        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
+        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+ File.separator+ vidCount+".mp4";
+        vidCount++;
 
         File fp = new File(filePath);
         try {
@@ -121,12 +163,14 @@ public class Recorder implements Callable<Integer> {
         return filePath;
     }
 
-    public File getFilePath2(){
+    public synchronized File getFilePath2(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
-        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+vidCount+".mp4";
+        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+ File.separator+ vidCount+".mp4";
+        vidCount++;
 
         File fp = new File(filePath);
+
         try {
             fp.createNewFile();
         }catch(IOException ex){
@@ -139,11 +183,5 @@ public class Recorder implements Callable<Integer> {
     public void storeVideoToFirebase(File video){
 
     }
-
-    public void run(){
-        Looper.prepare();
-        record();
-    }
-
 
 }//end of record class

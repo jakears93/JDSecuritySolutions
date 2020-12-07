@@ -61,5 +61,7 @@
 
     !--ViewerDevice Strings
     <string name="LiveLabel">VIVRE</string>
+    <string name="NoMoreVideos">You have reached the end of your recording.</string>
+
 
 </resources>

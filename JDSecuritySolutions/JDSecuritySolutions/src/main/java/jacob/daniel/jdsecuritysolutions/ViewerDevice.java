@@ -35,7 +35,7 @@ public class ViewerDevice extends BottomNavigationInflater {
     String fileName;
     String roomName;
     int vidIndex = 0;
-    int vidCount = 5;
+    int vidCount = 25;
     VideoView screen;
     SeekBar seek;
     private SharedPreferences userInfo;
@@ -118,9 +118,17 @@ public class ViewerDevice extends BottomNavigationInflater {
     public void setVideo() {
         int progress = (vidIndex * 100 / vidCount);
         seek.setProgress(progress);
-        fileName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + roomName + vidIndex + ".mp4";
-        screen.setVideoPath(fileName);
-        screen.start();
+        fileName =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+ File.separator+ vidIndex+".mp4";
+        File fp = new File(fileName);
+        if(fp.exists()){
+            screen.setVideoPath(fileName);
+            screen.start();
+            Log.println(Log.INFO, "Video Viewer", fileName);
+        }
+        else{
+            Toast toast = Toast.makeText(getApplicationContext(),getResources().getString(R.string.NoMoreVideos), Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
     @Override
