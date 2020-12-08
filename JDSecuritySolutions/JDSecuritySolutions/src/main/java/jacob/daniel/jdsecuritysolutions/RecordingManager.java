@@ -20,8 +20,6 @@ public class RecordingManager implements Callable {
     SurfaceView screen;
     public static boolean allowRecord;
     public static boolean startRecord;
-    public static boolean startPrep;
-
 
     RecordingManager(Context context, SurfaceView screen, EditText room, boolean allow){
         this.context = context;
@@ -37,22 +35,14 @@ public class RecordingManager implements Callable {
         this.startRecord = true;
         ExecutorService executor = Executors.newFixedThreadPool(2);
         Callable<Boolean> recorder = new Recorder(context, screen, room);
-/*        Callable<Boolean> recorder2 = new Recorder(context, screen, room);*/
         Log.println(Log.INFO, "Manager", "Starting Thread 1");
         Future<Boolean> future = executor.submit(recorder);
-/*        Thread.sleep(100);
-        Log.println(Log.INFO, "Manager", "Starting Thread 2");
-        Future<Boolean> future2 = executor.submit(recorder2);*/
 
         while(allowRecord){
             if(future.isDone()){
                 Log.println(Log.INFO, "Manager", "Starting Thread 1");
                 future = executor.submit(recorder);
             }
-/*            if(future2.isDone()){
-                Log.println(Log.INFO, "Manager", "Starting Thread 2");
-                future2 = executor.submit(recorder2);
-            }*/
         }
         return null;
     }
