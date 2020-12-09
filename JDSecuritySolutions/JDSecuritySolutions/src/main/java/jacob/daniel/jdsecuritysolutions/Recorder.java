@@ -112,7 +112,14 @@ public class Recorder implements Callable<Boolean> {
     class MyListener implements MediaRecorder.OnInfoListener{
         @Override
         public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
-            if(i==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING){
+            if(i==MediaRecorder.MEDIA_RECORDER_INFO_NEXT_OUTPUT_FILE_STARTED){
+                if(lastFilePath!=null && !end){
+                    lastFile = new File(lastFilePath);
+                    Log.println(Log.INFO, "Firebase", "Uploading last saved video: "+lastFilePath);
+                    uploadVideoToFirebase(lastFile);
+                }
+            }
+            else if(i==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING){
                 Log.println(Log.INFO, "MediaRecorder", "Approaching MaxFileSize");
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                     Log.println(Log.INFO, "FileType", "Updated");
@@ -123,11 +130,6 @@ public class Recorder implements Callable<Boolean> {
                         recorder.setNextOutputFile(fp);
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }
-                    if(lastFilePath!=null && !end){
-                        lastFile = new File(lastFilePath);
-                        Log.println(Log.INFO, "Firebase", "Uploading last saved video: "+lastFilePath);
-                        uploadVideoToFirebase(lastFile);
                     }
                 }
                 //Older Api creates new object and starts recording again.
@@ -151,13 +153,16 @@ public class Recorder implements Callable<Boolean> {
                 recorder.stop();
                 recorder.release();
                 this.end = true;
-                boolean delete = fp.delete();
+                lastFileId = fileID;
+                lastFilePath = fp.getPath();
+                uploadVideoToFirebase(fp);
+/*                boolean delete = fp.delete();
                 if(delete) {
                     Log.println(Log.INFO, "Deleting File Success", fp.toString());
                 }
                 else{
                     Log.println(Log.INFO, "Deleting File Failed", fp.toString());
-                }
+                }*/
             }
         }
     }
@@ -204,7 +209,7 @@ public class Recorder implements Callable<Boolean> {
 
     //Get max filesize out of shared prefs from settings
     private long getMaxFileSize(){
-        return 5000000;
+        return 3000000;
     }
 
     //Get file id
@@ -223,36 +228,12 @@ public class Recorder implements Callable<Boolean> {
         final StorageReference newFile = storageRef.child(fbPath);
         Uri file = Uri.fromFile(video);
 
-        //Metadata
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(context, file);
-        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        Log.println(Log.INFO, "upload", "File duration "+time);
-
-        final StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType("video/mp4")
-                .setCustomMetadata("Duration", time)
-                .build();
-
 
         newFile.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Log.println(Log.INFO, "Firebase", "Upload Successful: "+lastFilePath);
-                        newFile.updateMetadata(metadata)
-                                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                                    @Override
-                                    public void onSuccess(StorageMetadata storageMetadata) {
-                                        Log.println(Log.INFO, "Firebase", "Metadata Upload Successful: "+lastFilePath);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception exception) {
-                                        Log.println(Log.INFO, "Firebase", "MetaData Upload Failed: "+lastFilePath);
-                                    }
-                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

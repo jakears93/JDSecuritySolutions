@@ -45,6 +45,10 @@
     <string name="Settings">Réglages</string>
     <string name="Recorder">Enregistreur</string>
     <string name="Viewer">Téléspectatrice</string>
+    <string name="Home">Maison</string>
+
+    !--Settings Strings
+    <string name="Logout">Logout</string>
 
     !--Permissions
     <string name="FailedPermission">ÉCHEC DES PERMISSIONS D\'OBTENTION</string>

@@ -39,9 +39,11 @@ public class CameraDevice extends BottomNavigationInflater {
         // Checks the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setContentView(R.layout.camera_device);
+            super.createNavListener();
         }
         else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.camera_device_landscape);
+            super.createNavListener();
         }
     }
 
@@ -50,7 +52,6 @@ public class CameraDevice extends BottomNavigationInflater {
         super.onCreate(savedInstanceState);
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
-        super.createNavListener();
         room = findViewById(R.id.RoomName);
         toggle = findViewById(R.id.toggle);
         screen = findViewById(R.id.video);
@@ -75,7 +76,7 @@ public class CameraDevice extends BottomNavigationInflater {
     }
 
     public void checkPermissions() {
-        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
         int approvedPermissions = 0;
         for(int i=0; i<permissions.length; i++){
             if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
@@ -85,7 +86,7 @@ public class CameraDevice extends BottomNavigationInflater {
                 approvedPermissions++;
             }
         }
-        if(approvedPermissions == 3){
+        if(approvedPermissions == 4){
             allowRecord = true;
         }
     }

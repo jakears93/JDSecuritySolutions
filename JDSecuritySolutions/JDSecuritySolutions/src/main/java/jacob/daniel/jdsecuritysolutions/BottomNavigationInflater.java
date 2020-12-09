@@ -28,16 +28,24 @@ public abstract class BottomNavigationInflater extends AppCompatActivity {
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Intent intent;
                     switch (item.getItemId()){
-                        case R.id.menu_settings:
+                        case R.id.menu_home:
                             intent = new Intent(getBaseContext(), ChooseConfig.class);
+                            finish();
+                            startActivity(intent);
+                            break;
+                        case R.id.menu_settings:
+                            intent = new Intent(getBaseContext(), Settings.class);
+                            finish();
                             startActivity(intent);
                             break;
                         case R.id.menu_viewer:
                             intent = new Intent(getBaseContext(), ViewerMenu.class);
+                            finish();
                             startActivity(intent);
                             break;
                         case R.id.menu_recorder:
                             intent = new Intent(getBaseContext(), CameraDevice.class);
+                            finish();
                             startActivity(intent);
                             break;
                     }

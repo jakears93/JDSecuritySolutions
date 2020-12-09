@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 import android.widget.VideoView;
@@ -25,12 +27,26 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 
 public class ViewerDevice extends BottomNavigationInflater {
 
@@ -40,6 +56,16 @@ public class ViewerDevice extends BottomNavigationInflater {
     int vidCount = 25;
     VideoView screen;
     SeekBar seek;
+    SharedPreferences userInfo;
+    String username;
+    TextView roomTitle;
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +73,14 @@ public class ViewerDevice extends BottomNavigationInflater {
         this.roomName = getIntent().getExtras().getString("roomname");
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
-        super.createNavListener();
+
+        userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
+        username = userInfo.getString("User", "username");
+        roomTitle = findViewById(R.id.RoomNameLabel);
+
+        roomTitle.setText(this.roomName);
+
+
         seek = (SeekBar) findViewById(R.id.videoProgress);
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -67,7 +100,16 @@ public class ViewerDevice extends BottomNavigationInflater {
 
         screen = findViewById(R.id.recordedVideo);
 
-        setVideo();
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Callable<Boolean> mediaPlayer = new JDMediaPlayer(this, screen, username, roomName);
+        Log.println(Log.INFO, "ViewerDevice", "Starting MediaPlayer Thread");
+        Future<Boolean> future = executor.submit(mediaPlayer);
+        if(future.isDone()){
+            Log.println(Log.INFO, "JDMediaPlayer", "No More Content to Play");
+        }
+
+
+/*        setVideo();
         vidIndex++;
 
         screen.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
@@ -84,7 +126,7 @@ public class ViewerDevice extends BottomNavigationInflater {
                     seek.setProgress(progress);
                 }
             }
-        });
+        });*/
     }
 
     @Override
@@ -94,9 +136,11 @@ public class ViewerDevice extends BottomNavigationInflater {
         // Checks the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setContentView(R.layout.viewer_device);
+            super.createNavListener();
         }
         else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.viewer_device_landscape);
+            super.createNavListener();
         }
     }
 
@@ -143,4 +187,6 @@ public class ViewerDevice extends BottomNavigationInflater {
         }
 
     }
+
+
 }

@@ -1,6 +1,7 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,9 +35,11 @@ public class ChooseConfig extends BottomNavigationInflater {
         // Checks the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setContentView(R.layout.choose_config);
+            super.createNavListener();
         }
         else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.choose_config_landscape);
+            super.createNavListener();
         }
     }
 
@@ -45,14 +48,13 @@ public class ChooseConfig extends BottomNavigationInflater {
         super.onCreate(savedInstanceState);
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
-        super.createNavListener();
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
     }
 
 
     public void clickedViewer(View v){
-        if(checkPermissions() ==3){
+        if(checkViewerPermissions() ==2){
             Intent intent = new Intent(ChooseConfig.this, ViewerMenu.class);
             //Saved device type to shared pref (1 being viewer)
             editor.putInt("Device", 1);
@@ -62,7 +64,7 @@ public class ChooseConfig extends BottomNavigationInflater {
     }
 
     public void clickedCamera(View v){
-        if(checkPermissions()==3){
+        if(checkRecorderPermissions()==4){
             Intent intent = new Intent(ChooseConfig.this, CameraDevice.class);
             //Saved device type to shared pref (2 being camera)
             editor.putInt("Device", 2);
@@ -72,8 +74,22 @@ public class ChooseConfig extends BottomNavigationInflater {
     }
 
 
-    public int checkPermissions() {
-        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    public int checkViewerPermissions() {
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
+        int approvedPermissions = 0;
+        for(int i=0; i<permissions.length; i++){
+            if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, permissions, 10);
+            }
+            if (ActivityCompat.checkSelfPermission(this, permissions[i]) == PackageManager.PERMISSION_GRANTED) {
+                approvedPermissions++;
+            }
+        }
+        return approvedPermissions;
+    }
+
+    public int checkRecorderPermissions() {
+        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
         int approvedPermissions = 0;
         for(int i=0; i<permissions.length; i++){
             if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {

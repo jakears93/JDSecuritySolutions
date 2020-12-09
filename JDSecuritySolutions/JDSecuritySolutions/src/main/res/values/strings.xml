@@ -45,6 +45,11 @@
     <string name="Settings">Settings</string>
     <string name="Recorder">Recorder</string>
     <string name="Viewer">Viewer</string>
+    <string name="Home">Home</string>
+
+    !--Settings Strings
+    <string name="Logout">Logout</string>
+
 
     !--Permissions
     <string name="FailedPermission">FAILED GAINING PERMISSIONS</string>
