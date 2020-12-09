@@ -2,7 +2,6 @@ package jacob.daniel.jdsecuritysolutions;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,12 +13,12 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 
 import java.util.HashMap;
 
@@ -38,6 +37,7 @@ public class LoginAndRegister extends AppCompatActivity {
     private SharedPreferences userInfo;
     private EditText usernameField;
     private EditText passwordField;
+    CheckBox check;
     private boolean remember = false;
     private SharedPreferences.Editor editor;
 
@@ -48,6 +48,7 @@ public class LoginAndRegister extends AppCompatActivity {
         onConfigurationChanged(orientation);
         usernameField = (EditText) findViewById(R.id.addUser);
         passwordField = (EditText) findViewById(R.id.addPass);
+        check = findViewById(R.id.remember);
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
         attemptAutoLogin();
@@ -73,7 +74,7 @@ public class LoginAndRegister extends AppCompatActivity {
             startActivity(intent);
         }
         else if (loginCode == 1){
-            Intent intent = new Intent(LoginAndRegister.this, ViewerDevice.class);
+            Intent intent = new Intent(LoginAndRegister.this, ViewerMenu.class);
             startActivity(intent);
         }
         else if (loginCode == 2){
@@ -97,9 +98,13 @@ public class LoginAndRegister extends AppCompatActivity {
     }
 
     public void rememberMe(View v){
-        CheckBox check = findViewById(R.id.remember);
         if(check.isChecked()){
             remember = true;
+            editor.putBoolean("LoggedIn", remember);
+            editor.commit();
+        }
+        else{
+            remember = false;
             editor.putBoolean("LoggedIn", remember);
             editor.commit();
         }
@@ -113,12 +118,13 @@ public class LoginAndRegister extends AppCompatActivity {
         if(remembered && !password.equals("") && !username.equals("")){
             usernameField.setText(username, EditText.BufferType.EDITABLE);
             passwordField.setText(password, EditText.BufferType.EDITABLE);
+            check.setChecked(remembered);
+            this.remember = remembered;
             authenticate(findViewById(R.id.submitButton));
         }
     }
 
     private void storeUserLocally(){
-        if(remember) {
             String username = usernameField.getText().toString();
             String password = passwordField.getText().toString();
             //add all values to userInfo
@@ -126,7 +132,6 @@ public class LoginAndRegister extends AppCompatActivity {
             editor.putString("Pass", password);
             editor.putBoolean("LoggedIn", remember);
             editor.commit();
-        }
     }
 
 

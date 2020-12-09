@@ -1,8 +1,11 @@
 package jacob.daniel.jdsecuritysolutions;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.CamcorderProfile;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -10,19 +13,30 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-//TODO uncomment for working version
 public class Recorder implements Callable<Boolean> {
 
-    private Boolean doneRecording;
-    String fileName;
     long maxFileSize;
     String fileID;
+    String lastFileId;
+    String filePath;
+    String lastFilePath;
+    String metaData;
+    File lastFile;
     EditText room;
     Context context;
     SurfaceView screen;
@@ -30,24 +44,34 @@ public class Recorder implements Callable<Boolean> {
     MediaRecorder recorder;
     File fp;
     boolean end = false;
-
+    SharedPreferences userInfo;
+    String username;
+    FirebaseStorage fbInstance;
 
     Recorder(Context context, SurfaceView screen, EditText room){
         this.maxFileSize = getMaxFileSize();
         this.room = room;
         this.context = context;
         this.screen = screen;
+
+        userInfo = context.getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
+        username = userInfo.getString("User", "username");
+
         String roomName = room.getText().toString().replaceAll("\\s+", "");
         File dir =  new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator);
-        dir.mkdirs();
-        this.doneRecording = false;
+        if(dir.mkdirs()){
+            Log.println(Log.INFO, "Directory", "Successfully Created Root File Directory");
+        }
+        else{
+            Log.println(Log.INFO, "Directory", "Failed to Create Root File Directory");
+        }
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Boolean call(){
         prepare();
         record();
-        return this.doneRecording;
+        return true;
     }
 
     public void prepare(){
@@ -100,6 +124,11 @@ public class Recorder implements Callable<Boolean> {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    if(lastFilePath!=null && !end){
+                        lastFile = new File(lastFilePath);
+                        Log.println(Log.INFO, "Firebase", "Uploading last saved video: "+lastFilePath);
+                        uploadVideoToFirebase(lastFile);
+                    }
                 }
                 //Older Api creates new object and starts recording again.
                 else{
@@ -118,18 +147,16 @@ public class Recorder implements Callable<Boolean> {
         recorder.start();
 
         while(!end){
-            if(RecordingManager.allowRecord == false){
+            if(!RecordingManager.allowRecord){
                 recorder.stop();
                 recorder.release();
                 this.end = true;
-                fp.delete();
-                Log.println(Log.INFO, "Deleted Unfinished File", fp.toString());
-            }
-            else {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                boolean delete = fp.delete();
+                if(delete) {
+                    Log.println(Log.INFO, "Deleting File Success", fp.toString());
+                }
+                else{
+                    Log.println(Log.INFO, "Deleting File Failed", fp.toString());
                 }
             }
         }
@@ -138,12 +165,16 @@ public class Recorder implements Callable<Boolean> {
     public synchronized String getFilePath(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
+        lastFilePath = filePath;
+
         fileID = getFileId();
-        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator + fileID +".mp4";
+        filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator + fileID +".mp4";
 
         File fp = new File(filePath);
         try {
-            fp.createNewFile();
+            if(!fp.createNewFile()){
+                end=true;
+            }
         }catch(IOException ex){
             ex.printStackTrace();
         }
@@ -153,13 +184,18 @@ public class Recorder implements Callable<Boolean> {
     public synchronized File getFilePath2(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
+        lastFilePath = filePath;
+        lastFileId = fileID;
+
         fileID = getFileId();
-        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator + fileID +".mp4";
+        filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator + fileID +".mp4";
 
         File fp = new File(filePath);
 
         try {
-            fp.createNewFile();
+            if(!fp.createNewFile()){
+                end=true;
+            }
         }catch(IOException ex){
             ex.printStackTrace();
         }
@@ -168,19 +204,63 @@ public class Recorder implements Callable<Boolean> {
 
     //Get max filesize out of shared prefs from settings
     private long getMaxFileSize(){
-        return 2000000;
+        return 5000000;
     }
 
     //Get file id
     private String getFileId(){
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
-        String id = sdf.format(date);
-        return id;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss", context.getResources().getConfiguration().locale);
+        return sdf.format(date);
     }
 
     //TODO implement db storage
-    public void storeVideoToFirebase(File video){
+    public void uploadVideoToFirebase(File video){
+        fbInstance = FirebaseStorage.getInstance();
+        String roomName = room.getText().toString().replaceAll("\\s+", "");
+        StorageReference storageRef = fbInstance.getReference();
+        String fbPath = username+File.separator+roomName+File.separator+lastFileId;
+        final StorageReference newFile = storageRef.child(fbPath);
+        Uri file = Uri.fromFile(video);
+
+        //Metadata
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(context, file);
+        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        Log.println(Log.INFO, "upload", "File duration "+time);
+
+        final StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("video/mp4")
+                .setCustomMetadata("Duration", time)
+                .build();
+
+
+        newFile.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.println(Log.INFO, "Firebase", "Upload Successful: "+lastFilePath);
+                        newFile.updateMetadata(metadata)
+                                .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                                    @Override
+                                    public void onSuccess(StorageMetadata storageMetadata) {
+                                        Log.println(Log.INFO, "Firebase", "Metadata Upload Successful: "+lastFilePath);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        Log.println(Log.INFO, "Firebase", "MetaData Upload Failed: "+lastFilePath);
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.println(Log.INFO, "Firebase", "Upload Failed: "+lastFilePath);
+                    }
+                });
 
     }
 

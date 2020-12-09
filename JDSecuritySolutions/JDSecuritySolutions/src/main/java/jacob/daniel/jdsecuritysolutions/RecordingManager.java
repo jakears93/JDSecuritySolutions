@@ -2,11 +2,9 @@ package jacob.daniel.jdsecuritysolutions;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceView;
 import android.widget.EditText;
 
-import androidx.camera.core.CameraX;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;

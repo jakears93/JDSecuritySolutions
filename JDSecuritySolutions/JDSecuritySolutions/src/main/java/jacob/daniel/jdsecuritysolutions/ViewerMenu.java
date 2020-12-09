@@ -6,11 +6,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -29,6 +32,8 @@ public class ViewerMenu extends BottomNavigationInflater {
     int height;
     int width;
     String username;
+    ScrollView scrollView;
+    BottomNavigationView bottomNavigationView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +45,7 @@ public class ViewerMenu extends BottomNavigationInflater {
 
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
-        super.createNavListener();
+
     }
 
     private String[] getRooms(){
@@ -52,10 +57,25 @@ public class ViewerMenu extends BottomNavigationInflater {
     public void createGrid(int orientation){
         title=findViewById(R.id.ChooseRoomTitle);
         title.setText(username);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        height = displayMetrics.heightPixels;
-        width = displayMetrics.widthPixels;
+
+        WindowMetrics wm = getWindowManager().getCurrentWindowMetrics();
+        Rect bounds = wm.getBounds();
+        height = bounds.height();
+        width = bounds.width();
+
+        bottomNavigationView = findViewById(R.id.navigationView);
+        int navHeight = bottomNavigationView.getHeight();
+        int textHeight = title.getHeight();
+
+
+     /*   ConstraintLayout.LayoutParams layout = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        layout.setMargins(0, textHeight, 0, navHeight);
+
+        scrollView = findViewById(R.id.scrollRooms);
+        scrollView.setLayoutParams(layout);
+        scrollView.setPadding(0,textHeight,0,navHeight);*/
+
         String[] rooms = getRooms();
         GridLayout gridLayout = findViewById(R.id.buttonGrid);
         gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
@@ -77,14 +97,15 @@ public class ViewerMenu extends BottomNavigationInflater {
                 button.setWidth(width/2);
             }
             else {
-                button.setHeight(height/2);
-                button.setWidth(height/2);
+                button.setHeight((height-70)/2);
+                button.setWidth((height-70)/2);
             }
 
             button.setText(rooms[i]);
             addListener(button, button.getText().toString());
-            Drawable img = getResources().getDrawable(R.drawable.room_clipart_background, getTheme());
+            Drawable img = getResources().getDrawable(R.drawable.jd_logo_medium, getTheme());
             button.setCompoundDrawablesWithIntrinsicBounds(null, img, null, null);
+            button.setBackgroundColor(getColor(R.color.mainBackground));
 
             gridLayout.addView(button);
         }
@@ -108,10 +129,12 @@ public class ViewerMenu extends BottomNavigationInflater {
         // Checks the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setContentView(R.layout.viewer_menu);
+            super.createNavListener();
             createGrid(0);
         }
         else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setContentView(R.layout.viewer_menu);
+            setContentView(R.layout.viewer_menu_landscape);
+            super.createNavListener();
             createGrid(1);
         }
     }

@@ -58,40 +58,41 @@ public class User{
         final User checkUser = new User();
 
         if(this.setDbReference()){
-            readData(this.dbRef, new OnGetDataListener() {
-                @Override
-                public void onSuccess(DataSnapshot dataSnapshot) {
-                    if(!referenceUser.username.equals("")){
-                        try {
-                            HashMap<String, Object> temp = (HashMap<String, Object>) dataSnapshot.getValue();
-                            for (String key : temp.keySet()) {
-                                String tempStr = String.valueOf(temp.get(key));
-                                if(key.equals("name")){
-                                    checkUser.name=tempStr;
-                                }
-                                else if(key.equals("email")){
-                                    checkUser.email=tempStr;
-                                }
-                                else if(key.equals("password")){
-                                    checkUser.password=tempStr;
-                                }
-                                else if(key.equals("username")){
-                                    checkUser.username=tempStr;
+            readData(this.dbRef,
+                    new OnGetDataListener() {
+                        @Override
+                        public void onSuccess(DataSnapshot dataSnapshot) {
+                            if(!referenceUser.username.equals("")){
+                                try {
+                                    HashMap<String, Object> temp = (HashMap<String, Object>) dataSnapshot.getValue();
+                                    for (String key : temp.keySet()) {
+                                        String tempStr = String.valueOf(temp.get(key));
+                                        if(key.equals("name")){
+                                            checkUser.name=tempStr;
+                                        }
+                                        else if(key.equals("email")){
+                                            checkUser.email=tempStr;
+                                        }
+                                        else if(key.equals("password")){
+                                            checkUser.password=tempStr;
+                                        }
+                                        else if(key.equals("username")){
+                                            checkUser.username=tempStr;
+                                        }
+                                    }
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
                                 }
                             }
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
                         }
-                    }
-                }
-                @Override
-                public void onStart() {
-                }
+                        @Override
+                        public void onStart() {
+                        }
 
-                @Override
-                public void onFailure() {
-                }
-            });
+                        @Override
+                        public void onFailure() {
+                        }
+                    });
         }
         return checkUser;
     }
