@@ -1,24 +1,19 @@
 package jacob.daniel.jdsecuritysolutions;
 
-import jacob.daniel.jdsecuritysolutions.R;
 import android.content.Context;
-import android.graphics.SurfaceTexture;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Looper;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 //TODO uncomment for working version
@@ -26,34 +21,31 @@ public class Recorder implements Callable<Boolean> {
 
     private Boolean doneRecording;
     String fileName;
-    static int vidCount = 0;
+    long maxFileSize;
+    String fileID;
     EditText room;
     Context context;
     SurfaceView screen;
     SurfaceHolder surfaceHolder;
     MediaRecorder recorder;
     File fp;
-    static boolean end = false;
+    boolean end = false;
 
 
     Recorder(Context context, SurfaceView screen, EditText room){
+        this.maxFileSize = getMaxFileSize();
         this.room = room;
         this.context = context;
         this.screen = screen;
         String roomName = room.getText().toString().replaceAll("\\s+", "");
-        File dir =  new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName);
+        File dir =  new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator);
         dir.mkdirs();
+        this.doneRecording = false;
     }
 
     @Override
     public Boolean call() throws Exception {
-        this.doneRecording = false;
         prepare();
-        while(RecordingManager.startRecord == false){
-            Thread.sleep(10);
-        }
-        RecordingManager.startRecord = false;
-        this.end = false;
         record();
         return this.doneRecording;
     }
@@ -81,9 +73,8 @@ public class Recorder implements Callable<Boolean> {
             recorder.setOutputFile(fileName);
         }
 
-        //recorder.setMaxDuration(2000);
+        recorder.setMaxFileSize(maxFileSize);
 
-        recorder.setMaxFileSize(3000000);
         MyListener listener = new MyListener();
         recorder.setOnInfoListener(listener);
 
@@ -97,18 +88,11 @@ public class Recorder implements Callable<Boolean> {
     class MyListener implements MediaRecorder.OnInfoListener{
         @Override
         public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
-            if(RecordingManager.allowRecord == false){
-                recorder.stop();
-                recorder.release();
-                Recorder.end = true;
-                fp.delete();
-                Log.println(Log.INFO, "Deleted Unfinished File", fp.toString());
-                vidCount--;
-                return;
-            }
             if(i==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING){
+                Log.println(Log.INFO, "MediaRecorder", "Approaching MaxFileSize");
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                     Log.println(Log.INFO, "FileType", "Updated");
+                    fileID = getFileId();
                     fp = getFilePath2();
                     Log.println(Log.INFO, "FileName", fp.toString());
                     try {
@@ -116,6 +100,13 @@ public class Recorder implements Callable<Boolean> {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }
+                //Older Api creates new object and starts recording again.
+                else{
+                    recorder.stop();
+                    recorder.release();
+                    prepare();
+                    record();
                 }
             }
         }
@@ -127,32 +118,28 @@ public class Recorder implements Callable<Boolean> {
         recorder.start();
 
         while(!end){
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if(RecordingManager.allowRecord == false){
+                recorder.stop();
+                recorder.release();
+                this.end = true;
+                fp.delete();
+                Log.println(Log.INFO, "Deleted Unfinished File", fp.toString());
+            }
+            else {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
-/*        try {
-            Thread.sleep(2000);
-            Log.println(Log.INFO, "MediaRecorder", "Stopping Recording"+fp.toString());
-            recorder.stop();
-            recorder.release();
-        }
-        catch(InterruptedException ex){
-            ex.printStackTrace();
-        }
-        doneRecording = true;
-        RecordingManager.startRecord = true;*/
-
     }
 
     public synchronized String getFilePath(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
-        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+ File.separator+ vidCount+".mp4";
-        vidCount++;
+        fileID = getFileId();
+        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator + fileID +".mp4";
 
         File fp = new File(filePath);
         try {
@@ -166,8 +153,8 @@ public class Recorder implements Callable<Boolean> {
     public synchronized File getFilePath2(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
-        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+ File.separator+ vidCount+".mp4";
-        vidCount++;
+        fileID = getFileId();
+        String filePath =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator + fileID +".mp4";
 
         File fp = new File(filePath);
 
@@ -177,6 +164,19 @@ public class Recorder implements Callable<Boolean> {
             ex.printStackTrace();
         }
         return fp;
+    }
+
+    //Get max filesize out of shared prefs from settings
+    private long getMaxFileSize(){
+        return 2000000;
+    }
+
+    //Get file id
+    private String getFileId(){
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+        String id = sdf.format(date);
+        return id;
     }
 
     //TODO implement db storage

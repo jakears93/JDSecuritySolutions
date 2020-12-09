@@ -33,7 +33,7 @@ public abstract class BottomNavigationInflater extends AppCompatActivity {
                             startActivity(intent);
                             break;
                         case R.id.menu_viewer:
-                            intent = new Intent(getBaseContext(), ViewerDevice.class);
+                            intent = new Intent(getBaseContext(), ViewerMenu.class);
                             startActivity(intent);
                             break;
                         case R.id.menu_recorder:

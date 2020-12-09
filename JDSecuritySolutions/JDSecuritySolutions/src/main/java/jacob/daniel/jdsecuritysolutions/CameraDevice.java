@@ -8,47 +8,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Matrix;
-import android.graphics.SurfaceTexture;
-import android.media.CamcorderProfile;
-import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Looper;
-import android.util.Log;
-import android.util.Rational;
-import android.util.Size;
-import android.view.Surface;
 import android.view.SurfaceView;
-import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.camera.core.CameraX;
-import androidx.camera.core.ImageCapture;
-import androidx.camera.core.ImageCaptureConfig;
-import androidx.camera.core.Preview;
-import androidx.camera.core.PreviewConfig;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.LifecycleOwner;
-
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 
-//TODO add surfaceview to layout
 //TODO reorganize code structure
 //TODO change vidcount to value from preferences
 
@@ -61,9 +32,6 @@ public class CameraDevice extends BottomNavigationInflater {
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
     RecordingManager recordManager;
-
-    TextureView textureView;
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -107,11 +75,17 @@ public class CameraDevice extends BottomNavigationInflater {
     }
 
     public void checkPermissions() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA};
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.RECORD_AUDIO }, 10);
+        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        int approvedPermissions = 0;
+        for(int i=0; i<permissions.length; i++){
+            if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, permissions, 10);
+            }
+            if (ActivityCompat.checkSelfPermission(this, permissions[i]) == PackageManager.PERMISSION_GRANTED) {
+                approvedPermissions++;
+            }
         }
-        else{
+        if(approvedPermissions == 3){
             allowRecord = true;
         }
     }
@@ -142,6 +116,7 @@ public class CameraDevice extends BottomNavigationInflater {
                         editor.commit();
                         Intent intent = new Intent(CameraDevice.this, LoginAndRegister.class);
                         startActivity(intent);
+                        finish();
                     }
                 })
                 .setNegativeButton(R.string.alert_cancel, null)

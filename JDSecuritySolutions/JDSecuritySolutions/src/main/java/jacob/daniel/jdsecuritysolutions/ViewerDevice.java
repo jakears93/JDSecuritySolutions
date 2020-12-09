@@ -28,27 +28,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 public class ViewerDevice extends BottomNavigationInflater {
 
-    BottomNavigationView bottomNav;
     String fileName;
     String roomName;
     int vidIndex = 0;
     int vidCount = 25;
     VideoView screen;
     SeekBar seek;
-    private SharedPreferences userInfo;
-    private SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.roomName = getIntent().getExtras().getString("roomname");
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
         super.createNavListener();
-        userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
-        editor = userInfo.edit();
         seek = (SeekBar) findViewById(R.id.videoProgress);
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -66,8 +65,6 @@ public class ViewerDevice extends BottomNavigationInflater {
             }
         });
 
-
-        roomName = getResources().getString(R.string.DefaultRoom).replaceAll("\\s+", "");
         screen = findViewById(R.id.recordedVideo);
 
         setVideo();
@@ -116,39 +113,34 @@ public class ViewerDevice extends BottomNavigationInflater {
     }
 
     public void setVideo() {
+        String path =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator;
+        String[] dirListing;
+        File dir = new File(path);
+        dirListing = dir.list();
+        if(dirListing!=null){
+            Arrays.sort(dirListing);
+        }
+
         int progress = (vidIndex * 100 / vidCount);
         seek.setProgress(progress);
-        fileName =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator +roomName+ File.separator+ vidIndex+".mp4";
-        File fp = new File(fileName);
-        if(fp.exists()){
-            screen.setVideoPath(fileName);
-            screen.start();
-            Log.println(Log.INFO, "Video Viewer", fileName);
+
+        if(vidIndex < dirListing.length){
+            fileName =  path+dirListing[vidIndex];
+            File fp = new File(fileName);
+            if(fp.exists()){
+                screen.setVideoPath(fileName);
+                screen.start();
+                Log.println(Log.INFO, "Video Viewer", fileName);
+            }
+            else{
+                Toast toast = Toast.makeText(getApplicationContext(),getResources().getString(R.string.NoMoreVideos), Toast.LENGTH_LONG);
+                toast.show();
+            }
         }
         else{
             Toast toast = Toast.makeText(getApplicationContext(),getResources().getString(R.string.NoMoreVideos), Toast.LENGTH_LONG);
             toast.show();
         }
-    }
 
-    @Override
-    public void onBackPressed(){
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.alert_logout_title)
-                .setMessage(R.string.alert_logout_message)
-
-                .setPositiveButton(R.string.alert_yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        editor.remove("User");
-                        editor.remove("Pass");
-                        editor.remove("LoggedIn");
-                        editor.commit();
-                        Intent intent = new Intent(ViewerDevice.this, LoginAndRegister.class);
-                        startActivity(intent);
-                    }
-                })
-                .setNegativeButton(R.string.alert_cancel, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 }

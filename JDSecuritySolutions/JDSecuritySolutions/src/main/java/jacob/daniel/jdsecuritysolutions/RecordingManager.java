@@ -28,22 +28,13 @@ public class RecordingManager implements Callable {
         this.screen = screen;
     }
 
-    //prep next worker when other worker is recording.
-    //TODO change to 1 recorder thread that continuously writes to new files.
     @Override
     public Object call() throws Exception {
         this.startRecord = true;
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        ExecutorService executor = Executors.newFixedThreadPool(1);
         Callable<Boolean> recorder = new Recorder(context, screen, room);
-        Log.println(Log.INFO, "Manager", "Starting Thread 1");
+        Log.println(Log.INFO, "Manager", "Starting Recorder Thread");
         Future<Boolean> future = executor.submit(recorder);
-
-        while(allowRecord){
-            if(future.isDone()){
-                Log.println(Log.INFO, "Manager", "Starting Thread 1");
-                future = executor.submit(recorder);
-            }
-        }
         return null;
     }
 

@@ -59,6 +59,9 @@
     <string name="DefaultRoom">Chambre par défaut</string>
     <string name="RecordFail">Échec du démarrage de l\'enregistreur</string>
 
+    !--ViewerMenu Strings
+    <string name="ViewerMenuTitle">Cameras</string>
+
     !--ViewerDevice Strings
     <string name="LiveLabel">VIVRE</string>
     <string name="NoMoreVideos">Vous avez atteint la fin de votre enregistrement.</string>

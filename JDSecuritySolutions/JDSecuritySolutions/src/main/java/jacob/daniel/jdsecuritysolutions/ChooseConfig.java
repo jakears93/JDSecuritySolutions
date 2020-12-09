@@ -1,10 +1,12 @@
 package jacob.daniel.jdsecuritysolutions;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -49,22 +52,39 @@ public class ChooseConfig extends BottomNavigationInflater {
 
 
     public void clickedViewer(View v){
-        Intent intent = new Intent(ChooseConfig.this, ViewerDevice.class);
-        //Saved device type to shared pref (1 being viewer)
-        editor.putInt("Device", 1);
-        editor.commit();
-        startActivity(intent);
+        if(checkPermissions() ==3){
+            Intent intent = new Intent(ChooseConfig.this, ViewerMenu.class);
+            //Saved device type to shared pref (1 being viewer)
+            editor.putInt("Device", 1);
+            editor.commit();
+            startActivity(intent);
+        }
     }
 
     public void clickedCamera(View v){
-        Intent intent = new Intent(ChooseConfig.this, CameraDevice.class);
-        //Saved device type to shared pref (2 being camera)
-        editor.putInt("Device", 2);
-        editor.commit();
-        startActivity(intent);
+        if(checkPermissions()==3){
+            Intent intent = new Intent(ChooseConfig.this, CameraDevice.class);
+            //Saved device type to shared pref (2 being camera)
+            editor.putInt("Device", 2);
+            editor.commit();
+            startActivity(intent);
+        }
     }
 
 
+    public int checkPermissions() {
+        String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        int approvedPermissions = 0;
+        for(int i=0; i<permissions.length; i++){
+            if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, permissions, 10);
+            }
+            if (ActivityCompat.checkSelfPermission(this, permissions[i]) == PackageManager.PERMISSION_GRANTED) {
+                approvedPermissions++;
+            }
+        }
+        return approvedPermissions;
+    }
 
     @Override
     public void onBackPressed(){
@@ -77,6 +97,9 @@ public class ChooseConfig extends BottomNavigationInflater {
                         ChooseConfig.super.onBackPressed();
                         editor.clear();
                         editor.commit();
+                        Intent intent = new Intent(ChooseConfig.this, LoginAndRegister.class);
+                        startActivity(intent);
+                        finish();
                     }
                 })
                 .setNegativeButton(R.string.alert_cancel, null)

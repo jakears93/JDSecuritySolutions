@@ -59,9 +59,13 @@
     <string name="DefaultRoom">Default Room</string>
     <string name="RecordFail">Failed to Start Recorder</string>
 
+    !--ViewerMenu Strings
+    <string name="ViewerMenuTitle">Cameras</string>
+
     !--ViewerDevice Strings
     <string name="LiveLabel">LIVE</string>
-    <string name="NoMoreVideos">You have reached the end of your recording.</string>
+    <string name="NoMoreVideos">You have reached the end of your recording.</string>\
+
 
 
 
