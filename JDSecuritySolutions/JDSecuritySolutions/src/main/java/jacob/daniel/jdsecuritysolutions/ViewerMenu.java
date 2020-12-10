@@ -12,23 +12,39 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ViewerMenu extends BottomNavigationInflater {
     private SharedPreferences userInfo;
@@ -37,8 +53,17 @@ public class ViewerMenu extends BottomNavigationInflater {
     int height;
     int width;
     String username;
+    String titleString;
     ScrollView scrollView;
     BottomNavigationView bottomNavigationView;
+    FirebaseStorage fbInstance;
+    StorageReference storageRef;
+    StorageReference roomRef;
+    StorageReference fileRef;
+    GridLayout gridLayout;
+    ArrayList files = new ArrayList();
+    boolean ready;
+    int orientation;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,23 +71,59 @@ public class ViewerMenu extends BottomNavigationInflater {
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
         username = userInfo.getString("User", "Username");
-        username+="'s "+getResources().getString(R.string.ViewerMenuTitle);
+        titleString = username+"'s "+getResources().getString(R.string.ViewerMenuTitle);
 
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
 
+        gridLayout = findViewById(R.id.buttonGrid);
+        gridLayout.removeAllViews();
     }
 
-    private String[] getRooms(){
-        //TODO get room names from firebase
-        String[] rooms = {"DefaultRoom", "LivingRoom", "BedRoom", "BathRoom", "ParentsRoom", "FrontYard", "Backyard", "Closet"};
-        return rooms;
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getRooms();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
-    public void createGrid(int orientation){
+    @Override
+    protected void onPostResume() {
+        gridLayout.removeAllViews();
+        super.onPostResume();
+    }
+
+    private void getRooms(){
+        fbInstance = FirebaseStorage.getInstance();
+        storageRef = fbInstance.getReference();
+        roomRef = storageRef.child(username+File.separator);
+        files = new ArrayList();
+        Log.println(Log.INFO, "Firebase", "References Made for "+username);
+
+        roomRef.listAll()
+                .addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                    @Override
+                    public void onSuccess(ListResult listResult) {
+                        Log.println(Log.INFO, "Firebase", "OnSuccess");
+                        for (StorageReference item : listResult.getItems()) {
+                            files.add(item.getName());
+                            Log.println(Log.INFO, "Rooms", item.getName());
+                        }
+                        Log.println(Log.INFO, "ViewerMenu", "Remaking Grid");
+                        createMyGrid(orientation);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.println(Log.INFO, "Firebase", "Directory Retrieval Failure");
+                    }
+                });
+    }
+
+
+    public void createMyGrid(int orientation){
         title=findViewById(R.id.ChooseRoomTitle);
-        title.setText(username);
+        title.setText(titleString);
 
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.R){
             WindowMetrics wm = getWindowManager().getCurrentWindowMetrics();
@@ -82,21 +143,25 @@ public class ViewerMenu extends BottomNavigationInflater {
         int navHeight = bottomNavigationView.getHeight();
         int textHeight = title.getHeight();
 
-        String[] rooms = getRooms();
-        GridLayout gridLayout = findViewById(R.id.buttonGrid);
+/*        files = new ArrayList();
+        files.add("DefaultRoom");
+        files.add("LivingRoom");
+        files.add("BathRoom");
+        files.add("BedRoom");*/
+
         gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
 
         if (orientation==0){
             gridLayout.setColumnCount(2);
-            gridLayout.setRowCount(rooms.length/2 + rooms.length%2);
+            gridLayout.setRowCount(files.size()/2 + files.size()%2);
         }
         else {
             gridLayout.setColumnCount(3);
-            gridLayout.setRowCount(rooms.length/3 + 1);
+            gridLayout.setRowCount(files.size()/3 + 1);
         }
 
 
-        for (int i = 0; i<rooms.length; i++) {
+        for (int i = 0; i<files.size(); i++) {
             Button button = new Button(this);
             if (orientation==0){
                 button.setHeight(width/2);
@@ -107,7 +172,7 @@ public class ViewerMenu extends BottomNavigationInflater {
                 button.setWidth((height-70)/2);
             }
 
-            button.setText(rooms[i]);
+            button.setText(files.get(i).toString());
             addListener(button, button.getText().toString());
             Drawable img = getResources().getDrawable(R.drawable.room_clipart, getTheme());
             button.setCompoundDrawablesWithIntrinsicBounds(null, img, null, null);
@@ -136,12 +201,12 @@ public class ViewerMenu extends BottomNavigationInflater {
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setContentView(R.layout.viewer_menu);
             super.createNavListener();
-            createGrid(0);
+            orientation = 0;
         }
         else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.viewer_menu_landscape);
             super.createNavListener();
-            createGrid(1);
+            orientation = 1;
         }
     }
 

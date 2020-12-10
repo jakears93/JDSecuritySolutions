@@ -26,7 +26,6 @@ public class JDMediaPlayer implements Callable<Boolean> {
     String username;
     String roomname;
     File video;
-    File nextVideo;
     FirebaseStorage fbInstance;
     StorageReference storageRef;
     StorageReference roomRef;

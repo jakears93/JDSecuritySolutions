@@ -46,11 +46,6 @@ public class LoginAndRegister extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
-        usernameField = (EditText) findViewById(R.id.addUser);
-        passwordField = (EditText) findViewById(R.id.addPass);
-        check = findViewById(R.id.remember);
-        userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
-        editor = userInfo.edit();
         attemptAutoLogin();
     }
 
@@ -65,6 +60,11 @@ public class LoginAndRegister extends AppCompatActivity {
         else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.activity_login_and_register_landscape);
         }
+        usernameField = (EditText) findViewById(R.id.addUser);
+        passwordField = (EditText) findViewById(R.id.addPass);
+        check = findViewById(R.id.remember);
+        userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
+        editor = userInfo.edit();
     }
 
     public void login(int loginCode){

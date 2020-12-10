@@ -148,6 +148,8 @@ public class Recorder implements Callable<Boolean> {
         Log.println(Log.INFO, "MediaRecorder", "Started Recording "+fp.toString());
         recorder.start();
 
+        createRoomReference();
+
         while(!end){
             if(!RecordingManager.allowRecord){
                 recorder.stop();
@@ -156,13 +158,6 @@ public class Recorder implements Callable<Boolean> {
                 lastFileId = fileID;
                 lastFilePath = fp.getPath();
                 uploadVideoToFirebase(fp);
-/*                boolean delete = fp.delete();
-                if(delete) {
-                    Log.println(Log.INFO, "Deleting File Success", fp.toString());
-                }
-                else{
-                    Log.println(Log.INFO, "Deleting File Failed", fp.toString());
-                }*/
             }
         }
     }
@@ -219,7 +214,39 @@ public class Recorder implements Callable<Boolean> {
         return sdf.format(date);
     }
 
-    //TODO implement db storage
+
+    public void createRoomReference(){
+        fbInstance = FirebaseStorage.getInstance();
+        final String roomName = room.getText().toString().replaceAll("\\s+", "");
+        Log.println(Log.INFO, "RoomReference", "Creating "+roomName);
+        StorageReference storageRef = fbInstance.getReference();
+        String fbPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName+".txt";
+        final File tempFile = new File(fbPath);
+        try {
+            tempFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        final Uri upload = Uri.fromFile(tempFile);
+        final StorageReference newFile = storageRef.child(username+File.separator+roomName);
+
+        newFile.putFile(upload)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.println(Log.INFO, "Firebase", "Upload Successful: "+upload.toString());
+                        tempFile.delete();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.println(Log.INFO, "Firebase", "Upload Failed: "+roomName);
+                        tempFile.delete();
+                    }
+                });
+    }
+
     public void uploadVideoToFirebase(File video){
         fbInstance = FirebaseStorage.getInstance();
         String roomName = room.getText().toString().replaceAll("\\s+", "");
