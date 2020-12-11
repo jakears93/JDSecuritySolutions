@@ -1,9 +1,12 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.CamcorderProfile;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -12,16 +15,12 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.EditText;
-
 import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -35,7 +34,6 @@ public class Recorder implements Callable<Boolean> {
     String lastFileId;
     String filePath;
     String lastFilePath;
-    String metaData;
     File lastFile;
     EditText room;
     Context context;

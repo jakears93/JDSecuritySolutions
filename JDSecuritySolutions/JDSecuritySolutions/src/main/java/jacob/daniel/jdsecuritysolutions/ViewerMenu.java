@@ -1,8 +1,10 @@
 package jacob.daniel.jdsecuritysolutions;
 
-import android.app.AlertDialog;
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -12,39 +14,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.WindowMetrics;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridLayout;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
-
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class ViewerMenu extends BottomNavigationInflater {
     private SharedPreferences userInfo;
@@ -54,15 +38,11 @@ public class ViewerMenu extends BottomNavigationInflater {
     int width;
     String username;
     String titleString;
-    ScrollView scrollView;
-    BottomNavigationView bottomNavigationView;
     FirebaseStorage fbInstance;
     StorageReference storageRef;
     StorageReference roomRef;
-    StorageReference fileRef;
     GridLayout gridLayout;
     ArrayList files = new ArrayList();
-    boolean ready;
     int orientation;
 
     @Override
@@ -137,17 +117,6 @@ public class ViewerMenu extends BottomNavigationInflater {
             height = displayMetrics.heightPixels;
             width = displayMetrics.widthPixels;
         }
-
-
-        bottomNavigationView = findViewById(R.id.navigationView);
-        int navHeight = bottomNavigationView.getHeight();
-        int textHeight = title.getHeight();
-
-/*        files = new ArrayList();
-        files.add("DefaultRoom");
-        files.add("LivingRoom");
-        files.add("BathRoom");
-        files.add("BedRoom");*/
 
         gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
 

@@ -1,47 +1,21 @@
 package jacob.daniel.jdsecuritysolutions;
 
-import android.app.AlertDialog;
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 import android.widget.VideoView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
-import com.google.firebase.storage.StorageReference;
-
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -81,7 +55,7 @@ public class ViewerDevice extends BottomNavigationInflater {
         roomTitle.setText(this.roomName);
 
 
-        seek = (SeekBar) findViewById(R.id.videoProgress);
+        seek = findViewById(R.id.videoProgress);
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
@@ -107,26 +81,6 @@ public class ViewerDevice extends BottomNavigationInflater {
         if(future.isDone()){
             Log.println(Log.INFO, "JDMediaPlayer", "No More Content to Play");
         }
-
-
-/*        setVideo();
-        vidIndex++;
-
-        screen.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-        {
-            @Override
-            public void onCompletion(MediaPlayer mp)
-            {
-                if(vidIndex < vidCount){
-                    setVideo();
-                    vidIndex++;
-                }
-                else{
-                    int progress = (vidIndex*100/vidCount);
-                    seek.setProgress(progress);
-                }
-            }
-        });*/
     }
 
     @Override
@@ -157,6 +111,7 @@ public class ViewerDevice extends BottomNavigationInflater {
     }
 
     public void setVideo() {
+        //TODO set video from firebase
         String path =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator;
         String[] dirListing;
         File dir = new File(path);

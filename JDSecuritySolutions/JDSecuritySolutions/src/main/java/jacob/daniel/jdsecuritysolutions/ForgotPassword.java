@@ -1,11 +1,14 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ForgotPassword extends AppCompatActivity {

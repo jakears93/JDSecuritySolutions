@@ -1,11 +1,13 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.content.Context;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.EditText;
-
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,7 +29,7 @@ public class RecordingManager implements Callable {
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object call() {
         this.startRecord = true;
         ExecutorService executor = Executors.newFixedThreadPool(1);
         Callable<Boolean> recorder = new Recorder(context, screen, room);

@@ -1,5 +1,9 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
@@ -21,15 +25,6 @@ import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.HashMap;
-
-//TODO fix record video
-//TODO landscape views
-//TODO french translation
-//TODO logout
-//TODO bottomnav
-//TODO shared pref on login (remember me button)
-//TODO login auth
-//TODO folder for video storage
 
 
 public class LoginAndRegister extends AppCompatActivity {
@@ -118,8 +113,8 @@ public class LoginAndRegister extends AppCompatActivity {
         if(remembered && !password.equals("") && !username.equals("")){
             usernameField.setText(username, EditText.BufferType.EDITABLE);
             passwordField.setText(password, EditText.BufferType.EDITABLE);
-            check.setChecked(remembered);
-            this.remember = remembered;
+            check.setChecked(true);
+            this.remember = true;
             authenticate(findViewById(R.id.submitButton));
         }
     }
@@ -177,7 +172,6 @@ public class LoginAndRegister extends AppCompatActivity {
                 }
                 if(checkUser.username.equals(checkUser.username) && !checkUser.username.equals("")){
                     if(checkUser.password.equals(user.password)){
-                        //status = userInfo.getInt("Device", 0);
                         status = 0;
                     }
                     else {

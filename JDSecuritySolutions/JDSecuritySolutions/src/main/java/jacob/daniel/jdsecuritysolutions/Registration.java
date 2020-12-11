@@ -1,11 +1,14 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DataSnapshot;
@@ -15,12 +18,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 
-
 public class Registration extends AppCompatActivity {
 
     EditText info;
     int status = 0;
-    boolean exists = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +96,6 @@ public class Registration extends AppCompatActivity {
             }
             @Override
             public void onStart() {
-                Toast toast=Toast.makeText(getApplicationContext(),"starting",Toast.LENGTH_SHORT);
-                toast.show();
             }
 
             @Override
@@ -161,8 +160,6 @@ public class Registration extends AppCompatActivity {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Toast toast=Toast.makeText(getApplicationContext(),getResources().getString(R.string.LoginFail),Toast.LENGTH_SHORT);
-                toast.show();
                 listener.onSuccess(dataSnapshot);
                 ref.removeEventListener(this);
             }
@@ -173,7 +170,6 @@ public class Registration extends AppCompatActivity {
                 ref.removeEventListener(this);
             }
         });
-
     }
 
     public interface OnGetDataListener {

@@ -1,5 +1,9 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;

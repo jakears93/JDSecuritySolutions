@@ -1,5 +1,9 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 
 public class ChooseConfig extends BottomNavigationInflater {
 

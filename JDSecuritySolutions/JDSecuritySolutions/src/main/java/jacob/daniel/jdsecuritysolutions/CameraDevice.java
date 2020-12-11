@@ -1,5 +1,9 @@
 package jacob.daniel.jdsecuritysolutions;
 
+//Course: CENG319
+//Team: JD Security Solutions
+//Author: Jacob Arsenault N01244276
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,10 +22,6 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-
-//TODO reorganize code structure
-//TODO change vidcount to value from preferences
 
 public class CameraDevice extends BottomNavigationInflater {
 
