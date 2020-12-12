@@ -140,7 +140,9 @@ public class CameraDevice extends BottomNavigationInflater {
 
     @Override
     public void onBackPressed(){
-        recordManager.setAllowRecord(false);
+        if(recordManager!= null){
+            recordManager.setAllowRecord(false);
+        }
         notificationManager.cancelAll();
         Intent intent = new Intent(CameraDevice.this, ChooseConfig.class);
         startActivity(intent);

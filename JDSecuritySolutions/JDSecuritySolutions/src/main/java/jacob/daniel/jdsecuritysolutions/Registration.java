@@ -115,6 +115,7 @@ public class Registration extends AppCompatActivity {
     public void returnToLogin(View v){
         Intent intent = new Intent(Registration.this, LoginAndRegister.class);
         startActivity(intent);
+        finish();
     }
 
     private User validateInfo(){

@@ -40,6 +40,7 @@ public class ForgotPassword extends AppCompatActivity {
         if(status == 0){
             Intent intent = new Intent(ForgotPassword.this, LoginAndRegister.class);
             startActivity(intent);
+            finish();
         }
     }
 
