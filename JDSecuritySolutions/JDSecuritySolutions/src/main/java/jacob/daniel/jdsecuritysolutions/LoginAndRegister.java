@@ -30,8 +30,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-
 import java.util.HashMap;
 
 
@@ -45,8 +43,9 @@ public class LoginAndRegister extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     GoogleSignInClient mGoogleSignInClient;
     SignInButton gsi;
-    private int RC_SIGN_IN = 1;
+    final private int RC_SIGN_IN = 1;
 
+    //Initialize views and objects
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +58,7 @@ public class LoginAndRegister extends AppCompatActivity {
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        //setup onclick listener for google button
         gsi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,6 +69,7 @@ public class LoginAndRegister extends AppCompatActivity {
         });
     }
 
+    //change layout based on orientation
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -87,6 +88,7 @@ public class LoginAndRegister extends AppCompatActivity {
         editor = userInfo.edit();
     }
 
+    //called once authenticated
     public void login(int loginCode){
         if (loginCode == 0){
             Intent intent = new Intent(LoginAndRegister.this, ChooseConfig.class);
@@ -106,16 +108,19 @@ public class LoginAndRegister extends AppCompatActivity {
         }
     }
 
+    //move to registration layout
     public void register(View v){
         Intent intent = new Intent(LoginAndRegister.this, Registration.class);
         startActivity(intent);
     }
 
+    //move to forgotpassword layout
     public void forgotPassword(View v){
         Intent intent = new Intent(LoginAndRegister.this, ForgotPassword.class);
         startActivity(intent);
     }
 
+    //saves the rememberme state in sharedprefs based on checkbox
     public void rememberMe(View v){
         if(check.isChecked()){
             remember = true;
@@ -129,6 +134,7 @@ public class LoginAndRegister extends AppCompatActivity {
         }
     }
 
+    //attempts to auto log in based on sharedprefs information.
     public void attemptAutoLogin(){
         //check if login remembered
         String username = userInfo.getString("User", "");
@@ -143,6 +149,7 @@ public class LoginAndRegister extends AppCompatActivity {
         }
     }
 
+    //store all info into sharedprefs
     private void storeUserLocally(){
             String username = usernameField.getText().toString();
             String password = passwordField.getText().toString();
@@ -154,6 +161,7 @@ public class LoginAndRegister extends AppCompatActivity {
     }
 
 
+    //parent method to store user and then authenticate using checkDBlogin
     public void authenticate(View v){
         //Check user/pass in database. for each failed check, decrement status.  if any fail, login fails.
         String username = usernameField.getText().toString();
@@ -165,6 +173,8 @@ public class LoginAndRegister extends AppCompatActivity {
         checkDbLogin(user);
     }
 
+    //checks to see if user exists
+    //calls login, sending status code that tells if the user is approved or not
     public void checkDbLogin(final User user){
         DatabaseReference rootRef = database.getReference();
         final DatabaseReference userNameRef = rootRef.child("Usernames/"+user.username);
@@ -217,6 +227,7 @@ public class LoginAndRegister extends AppCompatActivity {
         });
     }
 
+    //read data from firebase for login retrieval
     public void readData(final DatabaseReference ref, final LoginAndRegister.OnGetDataListener listener) {
         final boolean hasFinished = false;
         listener.onStart();
@@ -258,6 +269,7 @@ public class LoginAndRegister extends AppCompatActivity {
                 .show();
     }
 
+    //Callback for google sign in button press
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -271,6 +283,7 @@ public class LoginAndRegister extends AppCompatActivity {
         }
     }
 
+    //handle sign in result, log in if approved.
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask){
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);

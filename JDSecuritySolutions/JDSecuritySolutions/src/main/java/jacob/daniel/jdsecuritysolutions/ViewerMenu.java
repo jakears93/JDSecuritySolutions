@@ -18,12 +18,10 @@ import android.view.View;
 import android.view.WindowMetrics;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
@@ -63,6 +61,7 @@ public class ViewerMenu extends BottomNavigationInflater {
     @Override
     protected void onStart() {
         super.onStart();
+        //find what rooms exist
         getRooms();
     }
 
@@ -72,6 +71,7 @@ public class ViewerMenu extends BottomNavigationInflater {
         super.onPostResume();
     }
 
+    //check firebase for empty room files in username root directory to see what rooms exist, store names in array
     private void getRooms(){
         fbInstance = FirebaseStorage.getInstance();
         storageRef = fbInstance.getReference();
@@ -101,6 +101,7 @@ public class ViewerMenu extends BottomNavigationInflater {
     }
 
 
+    //programmatically create a gridlayout based on what rooms exist.
     public void createMyGrid(int orientation){
         title=findViewById(R.id.ChooseRoomTitle);
         title.setText(titleString);
@@ -151,6 +152,7 @@ public class ViewerMenu extends BottomNavigationInflater {
         }
     }
 
+    //add listener to a each grid button
     public void addListener(Button button, final String text){
         button.setOnClickListener(new View.OnClickListener() {
             @Override

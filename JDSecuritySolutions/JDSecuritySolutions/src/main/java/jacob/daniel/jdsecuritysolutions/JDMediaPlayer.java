@@ -34,23 +34,27 @@ public class JDMediaPlayer implements Callable<Boolean> {
     StorageReference storageRef;
     StorageReference roomRef;
     StorageReference fileRef;
-    int vidIndex;
-    int attempts;
+    static int vidIndex;
+    static int vidCount;
     ArrayList files;
-    boolean readyToPlay = false;
-    boolean value;
+    boolean complete;
 
+    //initialize object
     JDMediaPlayer(Context context, VideoView screen, String username, String roomname){
         this.context = context;
         this.screen = screen;
         this.username = username;
         this.roomname = roomname;
+        this.vidIndex = 0;
+        this.vidCount = 0;
     }
 
+    //entry point for calling function
     @Override
     public Boolean call(){
         Log.println(Log.INFO, "JDMediaPlayer", "MediaPlayer Started");
 
+        //when video complete, move on to next video
         screen.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
         {
             @Override
@@ -60,33 +64,45 @@ public class JDMediaPlayer implements Callable<Boolean> {
             }
         });
 
+        //start to play videos if available
         listFirebaseVideos();
-        playFirebaseVideo();
 
-        while(!value){}
-        Log.println(Log.INFO, "JDMediaPlayer", "MediaPlayer Ended");
-        return value;
-    }
-
-    public void playFirebaseVideo(){
-        while(files.size()<=vidIndex){
-            if(attempts > 100){
-                value = true;
-                return;
-            }
-            Log.println(Log.INFO, "JDMediaPlayer", "Attempt "+attempts);
-            attempts++;
+        //keep thread alive until told to stop
+        //allows for scrubbing through videos
+        while(!ViewerDevice.stop){
             try {
-                Thread.sleep(50);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            if(complete && vidIndex<vidCount){
+                complete = false;
+                playFirebaseVideo();
+            }
         }
 
+        //stop playback when told to stop
+        screen.stopPlayback();
+
+        Log.println(Log.INFO, "JDMediaPlayer", "MediaPlayer Ended");
+        return true;
+    }
+
+    public void playFirebaseVideo(){
+        //only look for video if in range
+        if(vidIndex>=vidCount){
+            Log.println(Log.INFO, "JDMediaPlayer", "No More Videos");
+            complete = true;
+            return;
+        }
+        Log.println(Log.INFO, "JDMediaPlayer", "Starting to play video "+vidIndex);
+
+        //parse video file name
         String filePath = files.get(vidIndex).toString();
-        String[] fileComponents = filePath.split("/",6);
+        String[] fileComponents = filePath.split("/",10);
         filePath=fileComponents[fileComponents.length-1];
 
+        //create reference to indexed video
         fileRef = roomRef.child(filePath);
 
         try{
@@ -95,15 +111,16 @@ public class JDMediaPlayer implements Callable<Boolean> {
             ex.printStackTrace();
         }
 
+        //Once video is retrieved play it on videoview
         fileRef.getFile(video).addOnSuccessListener(
                 new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess (FileDownloadTask.TaskSnapshot taskSnapshot) {
                         Log.println(Log.INFO, "Firebase", "Download Success: "+video.toString());
                         vidIndex++;
-                        attempts = 0;
                         screen.setVideoURI(Uri.fromFile(video));
                         screen.start();
+                        Log.println(Log.INFO, "JDMediaPlayer", "Playing Video "+vidIndex+" of "+vidCount);
                     }
 
                 }).addOnFailureListener(new OnFailureListener(){
@@ -114,6 +131,8 @@ public class JDMediaPlayer implements Callable<Boolean> {
         });
     }
 
+    //collect list of videos in specific rooms storage.
+    //call playfirebasevideo on completion to start playback
     public void listFirebaseVideos(){
         fbInstance = FirebaseStorage.getInstance();
         storageRef = fbInstance.getReference();
@@ -130,7 +149,8 @@ public class JDMediaPlayer implements Callable<Boolean> {
                             files.add(item);
                             Log.println(Log.INFO, "Files", item.toString());
                         }
-                        readyToPlay = true;
+                        vidCount = files.size();
+                        playFirebaseVideo();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -139,7 +159,5 @@ public class JDMediaPlayer implements Callable<Boolean> {
                         Log.println(Log.INFO, "Firebase", "Directory Retrieval Failure");
                     }
                 });
-
     }
-
 }

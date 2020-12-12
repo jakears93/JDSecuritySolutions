@@ -46,6 +46,7 @@ public class Recorder implements Callable<Boolean> {
     String username;
     FirebaseStorage fbInstance;
 
+    //set up object. create room directory if it doesnt exist
     Recorder(Context context, SurfaceView screen, EditText room){
         this.maxFileSize = getMaxFileSize();
         this.room = room;
@@ -72,6 +73,7 @@ public class Recorder implements Callable<Boolean> {
         return true;
     }
 
+    //prepare mediarecorder by initializing settings
     public void prepare(){
         recorder = new MediaRecorder();
         surfaceHolder = screen.getHolder();
@@ -110,6 +112,7 @@ public class Recorder implements Callable<Boolean> {
     class MyListener implements MediaRecorder.OnInfoListener{
         @Override
         public void onInfo(MediaRecorder mediaRecorder, int i, int i1) {
+            //Once next file has started being recorded to, upload last file
             if(i==MediaRecorder.MEDIA_RECORDER_INFO_NEXT_OUTPUT_FILE_STARTED){
                 if(lastFilePath!=null && !end){
                     lastFile = new File(lastFilePath);
@@ -117,6 +120,7 @@ public class Recorder implements Callable<Boolean> {
                     uploadVideoToFirebase(lastFile);
                 }
             }
+            //set next file output once limit is approaching
             else if(i==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_APPROACHING){
                 Log.println(Log.INFO, "MediaRecorder", "Approaching MaxFileSize");
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -142,6 +146,7 @@ public class Recorder implements Callable<Boolean> {
 
     }
 
+    //start the recording and continue until recording manager stops it
     public void record(){
         Log.println(Log.INFO, "MediaRecorder", "Started Recording "+fp.toString());
         recorder.start();
@@ -160,6 +165,7 @@ public class Recorder implements Callable<Boolean> {
         }
     }
 
+    //get the file path for older api levels
     public synchronized String getFilePath(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
@@ -179,6 +185,7 @@ public class Recorder implements Callable<Boolean> {
         return filePath;
     }
 
+    //set file path for api level 29/30
     public synchronized File getFilePath2(){
         String roomName = room.getText().toString().replaceAll("\\s+", "");
 
@@ -201,6 +208,7 @@ public class Recorder implements Callable<Boolean> {
     }
 
     //Get max filesize out of shared prefs from settings
+    //implemented in next update
     private long getMaxFileSize(){
         return 3000000;
     }
@@ -212,7 +220,8 @@ public class Recorder implements Callable<Boolean> {
         return sdf.format(date);
     }
 
-
+    //create empty file for room.
+    //need to create file so viewer can locate which rooms exist as it doesnt detect directories
     public void createRoomReference(){
         fbInstance = FirebaseStorage.getInstance();
         final String roomName = room.getText().toString().replaceAll("\\s+", "");
@@ -245,6 +254,7 @@ public class Recorder implements Callable<Boolean> {
                 });
     }
 
+    //upload last video to firebase
     public void uploadVideoToFirebase(File video){
         fbInstance = FirebaseStorage.getInstance();
         String roomName = room.getText().toString().replaceAll("\\s+", "");

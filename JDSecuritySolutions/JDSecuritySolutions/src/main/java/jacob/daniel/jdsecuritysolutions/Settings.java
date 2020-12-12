@@ -42,7 +42,6 @@ public class Settings extends BottomNavigationInflater{
     }
 
     public void logout(View v){
-        finishAffinity();
         editor.clear();
         editor.commit();
         Intent intent = new Intent(Settings.this, LoginAndRegister.class);

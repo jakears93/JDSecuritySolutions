@@ -5,7 +5,7 @@
 ------------
 Jacob Arsenault N01244276
 <br>
-Daniel O'Donnell N01032911
+Concept created alongside Daniel O'Donnell
 
 ## Description
 ------------
@@ -19,15 +19,6 @@ This project aims to:
 -	Store recorded video locally and on an external database for access across multiple devices
 -	Set up multiple camera nodes so several areas can be monitored at once
 	
-## Next Steps
--------------
-1)	Store videos on firebase
-2)	Retrieve videos from firebase
-3)	Page for accesses camera views from different rooms
-4)	Live preview of what the camera is recording
-5)	Accurate scrubbing of video recordings
-6)	In-depth settings page for choosing video quality among other options 
-7)	Creation of test cases and unit testing using JUnit
 
 ## Update Log
 -------------
@@ -55,7 +46,17 @@ This project aims to:
 14)	Implemented bottom navigation menu
 15)	Confirmed working beta release on both emulated Pixel 3 and Physical Samsung Note 9
 
-## Current Issues
+#### Final Submission, Completion of Version 1.0
+1)	Completed recording and viewing classes, fully multithreaded
+2)	Completed layout touch-ups
+3)	Properly handles all permissions
+4)	Database storage for recordings implemented
+5)	Viewing videos from database implemented
+
+## Planned Future Updates
 -------------
-1)	MediaRecorder's protected finalize function runs async, file sometimes doesn't save properly, not allowing for playback. Problem is not constant and may depending on the write speed of the device.  More time to develop a solution is needed.
+1)	Finer tuned seekbar
+2)	Customizable settings such as resolution and storage destination
+3)	Option to delete recordings or entire user account
+4)	Increase user storage limit by switching storage database from Firebase Storage to Amazon s3
 

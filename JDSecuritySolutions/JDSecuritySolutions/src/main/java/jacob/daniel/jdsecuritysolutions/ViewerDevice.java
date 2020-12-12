@@ -8,14 +8,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
-import java.io.File;
-import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,20 +20,21 @@ import java.util.concurrent.Future;
 
 public class ViewerDevice extends BottomNavigationInflater {
 
-    String fileName;
     String roomName;
-    int vidIndex = 0;
-    int vidCount = 25;
     VideoView screen;
     SeekBar seek;
     SharedPreferences userInfo;
     String username;
     TextView roomTitle;
+    static boolean stop = false;
+    ExecutorService executor;
 
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        this.stop = true;
+        executor.shutdownNow();
         finish();
     }
 
@@ -54,8 +51,9 @@ public class ViewerDevice extends BottomNavigationInflater {
 
         roomTitle.setText(this.roomName);
 
-
+        //set seekbar listener
         seek = findViewById(R.id.videoProgress);
+        seek.setMax(100);
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
@@ -74,12 +72,39 @@ public class ViewerDevice extends BottomNavigationInflater {
 
         screen = findViewById(R.id.recordedVideo);
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+        //create threads to update seekbar in the background as well as play video
+        executor = Executors.newFixedThreadPool(2);
         Callable<Boolean> mediaPlayer = new JDMediaPlayer(this, screen, username, roomName);
         Log.println(Log.INFO, "ViewerDevice", "Starting MediaPlayer Thread");
         Future<Boolean> future = executor.submit(mediaPlayer);
         if(future.isDone()){
             Log.println(Log.INFO, "JDMediaPlayer", "No More Content to Play");
+        }
+
+        Runnable updater = new SeekBarUpdater();
+        executor.submit(updater);
+    }
+
+    //update the seekbar based on current index
+    class SeekBarUpdater implements Runnable {
+        int progress;
+        @Override
+        public void run() {
+            while(!stop){
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(JDMediaPlayer.vidIndex==0){
+                    progress=0;
+                }
+                else{
+                    progress = (int)(((float)JDMediaPlayer.vidIndex/(float)JDMediaPlayer.vidCount)*100);
+                }
+                Log.println(Log.INFO, "JDMediaPlayer", "Progress runnable: "+progress);
+                seek.setProgress(progress);
+            }
         }
     }
 
@@ -98,50 +123,9 @@ public class ViewerDevice extends BottomNavigationInflater {
         }
     }
 
-    //TODO add in finer seek detail, find file via progress chunk, find time via progresschunk %  screen.seekTo();
     public void setVideoFromProgress(int progress){
-        screen.stopPlayback();
-        if(progress == 0){
-            vidIndex = 0;
-        }
-        else {
-            vidIndex = (vidCount * progress)/100;
-        }
-        setVideo();
+        Log.println(Log.INFO, "ViewerDevice", "Progress: "+progress);
+        JDMediaPlayer.vidIndex = (int) (Math.round((JDMediaPlayer.vidCount * progress)/100))-1;
+        Log.println(Log.INFO, "ViewerDevice", "Index: "+JDMediaPlayer.vidIndex+" Count: "+JDMediaPlayer.vidCount);
     }
-
-    public void setVideo() {
-        //TODO set video from firebase
-        String path =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + "JDSecurity" + File.separator + roomName + File.separator;
-        String[] dirListing;
-        File dir = new File(path);
-        dirListing = dir.list();
-        if(dirListing!=null){
-            Arrays.sort(dirListing);
-        }
-
-        int progress = (vidIndex * 100 / vidCount);
-        seek.setProgress(progress);
-
-        if(vidIndex < dirListing.length){
-            fileName =  path+dirListing[vidIndex];
-            File fp = new File(fileName);
-            if(fp.exists()){
-                screen.setVideoPath(fileName);
-                screen.start();
-                Log.println(Log.INFO, "Video Viewer", fileName);
-            }
-            else{
-                Toast toast = Toast.makeText(getApplicationContext(),getResources().getString(R.string.NoMoreVideos), Toast.LENGTH_LONG);
-                toast.show();
-            }
-        }
-        else{
-            Toast toast = Toast.makeText(getApplicationContext(),getResources().getString(R.string.NoMoreVideos), Toast.LENGTH_LONG);
-            toast.show();
-        }
-
-    }
-
-
 }

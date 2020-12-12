@@ -5,7 +5,6 @@ package jacob.daniel.jdsecuritysolutions;
 //Author: Jacob Arsenault N01244276
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,25 +13,15 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 
 public class ChooseConfig extends BottomNavigationInflater {
 
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
-    private BottomNavigationView bottomNavigationView;
 
+    //change layout based on orientation
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -78,7 +67,7 @@ public class ChooseConfig extends BottomNavigationInflater {
         }
     }
 
-
+    //check permissions required to view videos
     public int checkViewerPermissions() {
         String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
         int approvedPermissions = 0;
@@ -93,6 +82,7 @@ public class ChooseConfig extends BottomNavigationInflater {
         return approvedPermissions;
     }
 
+    //check permissions required to record videos
     public int checkRecorderPermissions() {
         String[] permissions = {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
         int approvedPermissions = 0;

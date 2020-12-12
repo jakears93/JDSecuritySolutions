@@ -42,6 +42,7 @@ public class CameraDevice extends BottomNavigationInflater {
     private NotificationManagerCompat notificationManager;
     private String PRIMARY_CHANNEL_ID;
 
+    //Change layout based on orientation
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);

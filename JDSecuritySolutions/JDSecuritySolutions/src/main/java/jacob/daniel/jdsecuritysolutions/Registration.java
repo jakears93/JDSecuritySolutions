@@ -36,6 +36,7 @@ public class Registration extends AppCompatActivity {
         activeScreen = true;
     }
 
+    //listener for submit button
     public void submitInfo(View v){
         User user = validateInfo();
         if(status==0) {
@@ -56,8 +57,7 @@ public class Registration extends AppCompatActivity {
         }
     }
 
-    //TODO move checkIfUserExists method to user class
-
+    //check if user exists already, if not, add user to firebase and go back to log in
     public void checkIfUserExists(final View v, final User user){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -118,6 +118,7 @@ public class Registration extends AppCompatActivity {
         finish();
     }
 
+    //make sure all information inputted is valid before checking firebase for exisiting user
     private User validateInfo(){
         status = 0;
 
@@ -163,6 +164,7 @@ public class Registration extends AppCompatActivity {
         return user;
     }
 
+    //read firebase data
     public void readData(final DatabaseReference ref, final OnGetDataListener listener) {
         final boolean hasFinished = false;
         listener.onStart();

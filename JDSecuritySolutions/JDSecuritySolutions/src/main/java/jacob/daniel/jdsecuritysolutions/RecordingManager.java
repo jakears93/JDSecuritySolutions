@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+//this class is solely to create a separate thread to manage the recorder object
 public class RecordingManager implements Callable {
 
     EditText room;
