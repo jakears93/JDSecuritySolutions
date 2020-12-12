@@ -71,7 +71,11 @@
     <string name="LiveLabel">LIVE</string>
     <string name="NoMoreVideos">You have reached the end of your recording.</string>\
 
-
-
+    !--Notification Strings
+    <string name="channel_id">Primary Notification Channel</string>
+    <string name="notif_start">Device is recording.</string>
+    <string name="notif_end">Device has finished recording.</string>
+    <string name="channel_name">JD Security</string>
+    <string name="channel_description">Recording Status</string>
 
 </resources>

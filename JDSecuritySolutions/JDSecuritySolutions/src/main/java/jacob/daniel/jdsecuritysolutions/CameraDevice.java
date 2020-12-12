@@ -6,12 +6,16 @@ package jacob.daniel.jdsecuritysolutions;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.View;
@@ -20,6 +24,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,6 +39,8 @@ public class CameraDevice extends BottomNavigationInflater {
     private SharedPreferences userInfo;
     private SharedPreferences.Editor editor;
     RecordingManager recordManager;
+    private NotificationManagerCompat notificationManager;
+    private String PRIMARY_CHANNEL_ID;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -58,6 +67,9 @@ public class CameraDevice extends BottomNavigationInflater {
 
         userInfo = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE);
         editor = userInfo.edit();
+        //Create channel id and initialize notification manager
+        PRIMARY_CHANNEL_ID = getResources().getString(R.string.channel_id);
+        notificationManager = NotificationManagerCompat.from(this);
     }
 
     public void flippedSwitch(View v) {
@@ -68,10 +80,33 @@ public class CameraDevice extends BottomNavigationInflater {
                 ExecutorService executor = Executors.newFixedThreadPool(1);
                 recordManager = new RecordingManager(getApplicationContext(), screen, room, allowRecord);
                 executor.submit(recordManager);
+                //Turn on notification
+                createMyNotificationChannel();
+                Notification notif = new NotificationCompat.Builder(CameraDevice.this, PRIMARY_CHANNEL_ID)
+                        .setSmallIcon(R.drawable.jd_logo_small)
+                        .setContentTitle(getResources().getString(R.string.channel_name))
+                        .setContentText(getResources().getString(R.string.notif_start))
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                        .setOngoing(true)
+                        .build();
+
+                notificationManager.notify(1,notif);
             }
         }
         else if(!toggle.isChecked()){
             recordManager.setAllowRecord(false);
+            //Turn off notification
+            Notification notif2 = new NotificationCompat.Builder(CameraDevice.this, PRIMARY_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.jd_logo_small)
+                    .setContentTitle(getResources().getString(R.string.channel_name))
+                    .setContentText(getResources().getString(R.string.notif_end))
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                    .setAutoCancel(true)
+                    .build();
+
+            notificationManager.notify(1,notif2);
         }
     }
 
@@ -105,23 +140,20 @@ public class CameraDevice extends BottomNavigationInflater {
 
     @Override
     public void onBackPressed(){
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.alert_logout_title)
-                .setMessage(R.string.alert_logout_message)
+        recordManager.setAllowRecord(false);
+        notificationManager.cancelAll();
+        Intent intent = new Intent(CameraDevice.this, ChooseConfig.class);
+        startActivity(intent);
+        finish();
+    }
 
-                .setPositiveButton(R.string.alert_yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        editor.remove("User");
-                        editor.remove("Pass");
-                        editor.remove("LoggedIn");
-                        editor.commit();
-                        Intent intent = new Intent(CameraDevice.this, LoginAndRegister.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .setNegativeButton(R.string.alert_cancel, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    private void createMyNotificationChannel(){
+        //Create a notification channel in order to show notification on Android Oreo and above.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel1 = new NotificationChannel(PRIMARY_CHANNEL_ID, getResources().getString(R.string.channel_name), NotificationManager.IMPORTANCE_HIGH);
+            channel1.setDescription(getResources().getString(R.string.channel_description));
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel1);
+        }
     }
 }//end of parent class
