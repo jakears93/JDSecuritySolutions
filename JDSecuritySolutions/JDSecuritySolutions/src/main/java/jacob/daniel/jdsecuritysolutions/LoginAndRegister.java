@@ -50,14 +50,6 @@ public class LoginAndRegister extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Display Splashscreen
-        setContentView(R.layout.splashscreen);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
         attemptAutoLogin();
@@ -75,11 +67,6 @@ public class LoginAndRegister extends AppCompatActivity {
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
