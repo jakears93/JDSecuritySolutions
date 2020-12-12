@@ -22,12 +22,18 @@ public class Registration extends AppCompatActivity {
 
     EditText info;
     int status = 0;
+    boolean activeScreen;
+
+    public Registration(){
+        this.activeScreen = false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
+        activeScreen = true;
     }
 
     public void submitInfo(View v){
@@ -84,13 +90,15 @@ public class Registration extends AppCompatActivity {
                     ex.printStackTrace();
                 }
 
-                if(checkUser.username.equals(user.username)){
+                if(checkUser.username.equals(user.username) && activeScreen){
                     info.setError(getResources().getString(R.string.usernameErrorMsg));
                 }
                 else{
                     //Submit info to firebase
                     rootRef.child("Usernames").child(user.username).setValue(user);
-                    returnToLogin(v);
+                    if(activeScreen){
+                        returnToLogin(v);
+                    }
                 }
 
             }

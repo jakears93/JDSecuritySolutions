@@ -13,10 +13,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +44,9 @@ public class LoginAndRegister extends AppCompatActivity {
     CheckBox check;
     private boolean remember = false;
     private SharedPreferences.Editor editor;
+    GoogleSignInClient mGoogleSignInClient;
+    SignInButton gsi;
+    private int RC_SIGN_IN = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +54,20 @@ public class LoginAndRegister extends AppCompatActivity {
         Configuration orientation = getResources().getConfiguration();
         onConfigurationChanged(orientation);
         attemptAutoLogin();
+
+        gsi = findViewById(R.id.sign_in_button);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        gsi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.println(Log.INFO,"GoogleSignIn","Started");
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
     }
 
     @Override
@@ -63,7 +89,6 @@ public class LoginAndRegister extends AppCompatActivity {
     }
 
     public void login(int loginCode){
-
         if (loginCode == 0){
             Intent intent = new Intent(LoginAndRegister.this, ChooseConfig.class);
             startActivity(intent);
@@ -171,7 +196,7 @@ public class LoginAndRegister extends AppCompatActivity {
                     ex.printStackTrace();
                 }
                 if(checkUser.username.equals(checkUser.username) && !checkUser.username.equals("")){
-                    if(checkUser.password.equals(user.password)){
+                    if(checkUser.password.equals(user.password) && !user.password.equals("")){
                         status = 0;
                     }
                     else {
@@ -234,5 +259,38 @@ public class LoginAndRegister extends AppCompatActivity {
                 .show();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask){
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            // Signed in successfully, show authenticated UI.
+
+            User googleUser = new User(account.getDisplayName());
+            Registration register = new Registration();
+            register.checkIfUserExists(findViewById(R.id.sign_in_button), googleUser);
+            editor.putString("User", googleUser.username);
+            editor.putString("Pass", googleUser.password);
+            editor.commit();
+            Intent intent = new Intent(LoginAndRegister.this, ChooseConfig.class);
+            startActivity(intent);
+            finish();
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.println(Log.INFO, "GoogleSignInFailure", ""+e.getStatusCode());
+        }
+    }
 
 }
